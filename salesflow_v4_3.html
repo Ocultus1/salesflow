@@ -1,0 +1,1766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SalesFlow — Ocultum 0.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#07070f;--sur:#0f0f1c;--s2:#161628;--s3:#1e1e35;--bdr:#252540;
+  --txt:#f0f0ff;--t2:#8888bb;--t3:#4444aa;
+  --cazzu:#b0b0cc;--cazzu-g:#b0b0cc33;
+  --karol:#00e096;--karol-g:#00e09633;
+  --shak:#ffd700;--shak-g:#ffd70033;
+  --ang:#666680;--ang-g:#66668022;
+  --adm:#ff4d8d;--adm-g:#ff4d8d33;
+  --red:#ff4455;--red-g:#ff445533;
+  --fn:'Outfit',sans-serif;--dp:'Bebas Neue',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--txt);font-family:var(--fn);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);
+  background-size:44px 44px;}
+.scr{display:none;flex-direction:column;min-height:100vh;position:relative;z-index:1;}
+.scr.on{display:flex;}
+
+/* LOADING */
+#load{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.load-logo{font-family:var(--dp);font-size:48px;letter-spacing:5px;background:linear-gradient(135deg,#fff,var(--shak),var(--karol));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.load-bar{width:200px;height:3px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.load-fill{height:100%;background:linear-gradient(90deg,var(--karol),var(--shak));border-radius:2px;animation:lf 2s ease-out forwards;}
+@keyframes lf{from{width:0}to{width:100%}}
+.load-txt{font-size:11px;color:var(--t2);letter-spacing:2px;}
+
+/* OVERLAYS */
+.ov{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(10px);}
+.ov.on{display:flex;}
+.ovc{background:var(--sur);border:1px solid var(--bdr);border-radius:28px;padding:44px;text-align:center;max-width:380px;width:90%;position:relative;overflow:hidden;}
+#ov-lu{background:#00000088;}
+#ov-lu .ovc{animation:pop .5s cubic-bezier(.34,1.56,.64,1);}
+@keyframes pop{from{transform:scale(.4);opacity:0;}to{transform:scale(1);opacity:1;}}
+.lu-ic{font-size:72px;display:block;animation:spin .8s ease-out;}
+@keyframes spin{from{transform:rotateY(0) scale(0);}to{transform:rotateY(360deg) scale(1);}}
+.lu-ttl{font-family:var(--dp);font-size:52px;letter-spacing:3px;background:linear-gradient(135deg,var(--shak),var(--karol));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:12px 0 6px;}
+.cf{position:absolute;width:7px;height:7px;animation:cf 1.2s ease-out forwards;}
+@keyframes cf{from{transform:translateY(-10px) rotate(0);opacity:1;}to{transform:translateY(320px) rotate(720deg);opacity:0;}}
+#ov-pen{background:#ff000018;}
+#ov-pen .ovc{background:linear-gradient(135deg,#1a0505,#0a0010);border:2px solid var(--red);box-shadow:0 0 60px #ff445544;animation:pop .4s ease-out;}
+#ov-pen.shake{animation:shk .4s ease-out;}
+@keyframes shk{0%,100%{transform:translateX(0);}20%{transform:translateX(-12px);}40%{transform:translateX(12px);}60%{transform:translateX(-8px);}80%{transform:translateX(8px);}}
+#ov-cal{background:#00000088;}
+#ov-cal .ovc{animation:pop .3s ease-out;max-width:340px;}
+#ov-notifs{align-items:flex-start;justify-content:flex-end;padding:70px 16px 16px;}
+.notifs-panel{background:var(--sur);border:1px solid var(--bdr);border-radius:20px;width:100%;max-width:360px;max-height:80vh;overflow-y:auto;padding:20px;}
+#toast{position:fixed;top:76px;right:18px;padding:13px 20px;background:var(--sur);border:1px solid var(--karol);border-radius:14px;font-size:13px;font-weight:600;z-index:500;transform:translateX(130%);transition:transform .35s cubic-bezier(.34,1.56,.64,1);max-width:270px;}
+#toast.on{transform:translateX(0);}
+
+/* LOGIN */
+#scr-login{align-items:center;justify-content:center;background:radial-gradient(ellipse at 25% 75%,#1a0a3a,transparent 55%),radial-gradient(ellipse at 75% 25%,#0a1a2a,transparent 55%);}
+.lw{width:100%;max-width:400px;padding:20px;}
+.logo{font-family:var(--dp);font-size:60px;letter-spacing:5px;text-align:center;background:linear-gradient(135deg,#fff,var(--shak),var(--karol));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.ltag{text-align:center;font-size:11px;letter-spacing:4px;color:var(--t3);text-transform:uppercase;margin-bottom:8px;}
+.lver{text-align:center;font-size:10px;color:var(--t3);letter-spacing:2px;margin-bottom:28px;}
+.lbox{background:var(--sur);border:1px solid var(--bdr);border-radius:24px;padding:30px;position:relative;overflow:hidden;}
+.lbox::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--karol),var(--shak),var(--adm));}
+.tabs{display:flex;gap:5px;background:var(--s2);border-radius:12px;padding:4px;margin-bottom:26px;}
+.tab{flex:1;padding:9px;border-radius:9px;border:none;background:transparent;color:var(--t2);font-family:var(--fn);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;}
+.tab.on{background:var(--s3);color:var(--txt);border:1px solid var(--bdr);}
+.f{margin-bottom:14px;}
+.f label{display:block;font-size:10px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:6px;}
+.f input,.f select,.f textarea{width:100%;padding:12px 14px;background:var(--s2);border:1px solid var(--bdr);border-radius:11px;color:var(--txt);font-family:var(--fn);font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;resize:none;}
+.f input:focus,.f select:focus,.f textarea:focus{border-color:var(--karol);box-shadow:0 0 0 3px var(--karol-g);}
+.f select option{background:var(--s2);}
+.btn{width:100%;padding:14px;background:linear-gradient(135deg,#0a2a1a,#0a1a2a);border:1px solid var(--karol);border-radius:12px;color:var(--karol);font-family:var(--fn);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:6px;}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--karol-g);}
+.btn.ab{border-color:var(--adm);color:var(--adm);background:linear-gradient(135deg,#2a0a1a,#1a0a2a);}
+.btn.ab:hover{box-shadow:0 8px 24px var(--adm-g);}
+.err{color:var(--red);font-size:12px;text-align:center;margin-top:10px;min-height:16px;font-weight:600;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;background:var(--sur);border-bottom:1px solid var(--bdr);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.tlogo{font-family:var(--dp);font-size:22px;letter-spacing:3px;background:linear-gradient(135deg,#fff,var(--shak));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.tr{display:flex;align-items:center;gap:10px;}
+.bdg{padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;}
+.bk{background:var(--karol-g);color:var(--karol);border:1px solid var(--karol-g);}
+.bs2{background:var(--shak-g);color:var(--shak);border:1px solid var(--shak-g);}
+.bc{background:var(--cazzu-g);color:var(--cazzu);border:1px solid var(--cazzu-g);}
+.ba{background:var(--ang-g);color:var(--ang);border:1px solid var(--ang-g);}
+.bad{background:var(--adm-g);color:var(--adm);border:1px solid var(--adm-g);}
+.br2{background:var(--red-g);color:var(--red);border:1px solid var(--red-g);}
+.bell{position:relative;cursor:pointer;padding:7px 10px;border-radius:10px;border:1px solid var(--bdr);background:transparent;color:var(--t2);font-size:16px;transition:all .2s;}
+.bell:hover{border-color:var(--shak);color:var(--shak);}
+.bcnt{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:9px;font-weight:800;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.bout{padding:7px 14px;border-radius:8px;border:1px solid var(--bdr);background:transparent;color:var(--t2);font-family:var(--fn);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.bout:hover{border-color:var(--red);color:var(--red);}
+
+/* MAIN */
+.main{padding:22px;max-width:980px;margin:0 auto;width:100%;flex:1;}
+
+/* CARD */
+.card{background:var(--sur);border:1px solid var(--bdr);border-radius:18px;padding:22px;margin-bottom:15px;}
+.ct{font-size:13px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.cd{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+
+/* INSIGNIA */
+.ic{border-radius:22px;padding:26px;margin-bottom:18px;background:var(--sur);border:1px solid var(--bdr);}
+.ii{width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;border:3px solid;flex-shrink:0;animation:glow 3s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 18px var(--ic,transparent);}50%{box-shadow:0 0 36px var(--ic,transparent),0 0 54px var(--ic,transparent);}}
+.lvt{display:flex;gap:5px;margin:16px 0 6px;}
+.lvs{flex:1;height:7px;border-radius:4px;background:var(--s3);overflow:hidden;position:relative;}
+.lvs.on::after{content:'';position:absolute;inset:0;background:var(--sc,var(--karol));}
+.lvl{display:flex;justify-content:space-between;font-size:10px;color:var(--t3);font-weight:700;}
+.pb-ban{background:linear-gradient(135deg,#2a0505,#1a0010);border:1px solid var(--red);border-radius:14px;padding:16px 18px;margin-top:14px;}
+.pc{display:inline-block;padding:5px 14px;border-radius:20px;font-size:13px;font-weight:800;background:var(--red-g);border:1px solid var(--red);color:var(--red);margin-top:6px;}
+.ppt{background:var(--s3);border-radius:4px;height:8px;overflow:hidden;margin-top:10px;}
+.ppf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ff8888);}
+.nh{background:var(--s2);border:1px solid var(--bdr);border-radius:11px;padding:11px 14px;margin-top:12px;font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px;}
+
+/* STATS */
+.sr{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:11px;margin-bottom:18px;}
+.sc{background:var(--sur);border:1px solid var(--bdr);border-radius:15px;padding:17px;position:relative;overflow:hidden;}
+.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--sc,var(--karol));}
+.sl{font-size:10px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:7px;}
+.sv{font-family:var(--dp);font-size:26px;letter-spacing:1px;}
+.ss{font-size:11px;color:var(--t3);margin-top:3px;}
+
+/* TABS */
+.tnav{display:flex;gap:3px;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:4px;margin-bottom:18px;flex-wrap:wrap;}
+.tnb{flex:1;min-width:70px;padding:9px 6px;border-radius:10px;border:none;background:transparent;color:var(--t2);font-family:var(--fn);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tnb.on{background:var(--s3);color:var(--txt);border:1px solid var(--bdr);}
+.tp{display:none;}.tp.on{display:block;}
+
+/* FORM */
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.bsub{padding:12px 22px;background:linear-gradient(135deg,#0a2a1a,#0a1a2a);border:1px solid var(--karol);border-radius:11px;color:var(--karol);font-family:var(--fn);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:12px;}
+.bsub:hover{box-shadow:0 4px 16px var(--karol-g);}
+.bsm{padding:6px 13px;border-radius:8px;border:1px solid var(--bdr);background:var(--s2);color:var(--txt);font-family:var(--fn);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.bsm:hover{border-color:var(--karol);color:var(--karol);}
+.bg{border-color:var(--shak-g);color:var(--shak);}
+.bg:hover{border-color:var(--shak);}
+.br{border-color:var(--red-g);color:var(--red);}
+.br:hover{border-color:var(--red);}
+.bp{border-color:var(--adm-g);color:var(--adm);}
+.bp:hover{border-color:var(--adm);}
+
+/* DURATION BTNS */
+.dur-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.dur-btn{padding:8px 14px;border-radius:9px;border:1px solid var(--bdr);background:var(--s2);color:var(--t2);font-family:var(--fn);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;}
+.dur-btn.on{border-color:var(--karol);color:var(--karol);background:var(--karol-g);}
+
+/* TIMER */
+.timer-card{background:linear-gradient(135deg,#0a2a1a,#0a1a0a);border:1px solid var(--karol);border-radius:16px;padding:20px;text-align:center;margin-bottom:15px;}
+.timer-display{font-family:var(--dp);font-size:64px;letter-spacing:4px;color:var(--karol);}
+.timer-display.warning{color:var(--shak);animation:pulse 1s infinite;}
+.timer-display.done{color:var(--red);}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.timer-vendor{font-size:13px;color:var(--t2);margin-top:4px;}
+
+/* TABLE */
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:9px 13px;text-align:left;color:var(--t2);font-size:10px;letter-spacing:2px;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--bdr);}
+tbody tr{border-bottom:1px solid #25254022;transition:background .15s;}
+tbody tr:hover{background:var(--s2);}
+tbody td{padding:11px 13px;}
+
+/* IROW */
+.ir{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #25254033;}
+.ir:last-child{border-bottom:none;}
+.ik{font-size:12px;color:var(--t2);font-weight:500;}
+.iv{font-size:13px;font-weight:700;}
+
+/* PAY BTNS */
+.pr{display:flex;gap:8px;margin-top:8px;}
+.pb2{flex:1;padding:11px;border-radius:10px;border:1px solid var(--bdr);background:var(--s2);color:var(--t2);font-family:var(--fn);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;}
+.pb2.on.ef{border-color:var(--karol);color:var(--karol);background:var(--karol-g);}
+.pb2.on.qr{border-color:var(--shak);color:var(--shak);background:var(--shak-g);}
+
+/* VENDOR GRID */
+.vg{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:13px;}
+.vc{background:var(--sur);border:1px solid var(--bdr);border-radius:19px;padding:19px;position:relative;overflow:hidden;transition:transform .2s;}
+.vc:hover{transform:translateY(-3px);}
+.vc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--vc,var(--bdr));}
+.va{display:flex;gap:5px;flex-wrap:wrap;margin-top:12px;}
+.pd{position:absolute;top:14px;right:14px;width:8px;height:8px;border-radius:50%;background:var(--shak);box-shadow:0 0 8px var(--shak);animation:pdot 1.5s infinite;}
+@keyframes pdot{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* CALENDAR */
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.ch{text-align:center;font-size:10px;font-weight:700;color:var(--t3);padding:6px 0;}
+.cd2{border-radius:9px;background:var(--s2);border:1px solid var(--bdr);display:flex;flex-direction:column;align-items:center;padding:6px 3px;cursor:pointer;transition:all .2s;min-height:50px;}
+.cd2:hover{border-color:var(--karol);transform:scale(1.05);}
+.cd2.today{border-color:var(--shak);color:var(--shak);}
+.cd2.hev{background:#00e09611;border-color:var(--karol-g);}
+.cdn{font-size:12px;font-weight:700;}
+.cdots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:3px;}
+.dot2{width:5px;height:5px;border-radius:50%;}
+
+/* NOTIF */
+.ni{display:flex;align-items:flex-start;gap:12px;padding:14px;background:var(--s2);border:1px solid var(--bdr);border-radius:13px;margin-bottom:8px;position:relative;}
+.ni.u{border-color:var(--karol-g);background:#00e09608;}
+.ni.u::before{content:'';position:absolute;top:14px;right:14px;width:7px;height:7px;border-radius:50%;background:var(--karol);}
+
+/* CHAT */
+.msgs{height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:12px;background:var(--s2);border:1px solid var(--bdr);border-radius:14px;margin-bottom:10px;}
+.msg{max-width:75%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.4;}
+.msg.me{align-self:flex-end;background:var(--karol-g);border:1px solid var(--karol-g);border-radius:14px 14px 4px 14px;}
+.msg.them{align-self:flex-start;background:var(--s3);border:1px solid var(--bdr);border-radius:14px 14px 14px 4px;}
+.mn{font-size:10px;font-weight:700;margin-bottom:4px;color:var(--t2);}
+.mt{font-size:10px;color:var(--t3);margin-top:4px;text-align:right;}
+.mir{display:flex;gap:8px;}
+.mir input{flex:1;padding:11px 14px;background:var(--s2);border:1px solid var(--bdr);border-radius:11px;color:var(--txt);font-family:var(--fn);font-size:13px;outline:none;}
+.mir input:focus{border-color:var(--karol);}
+.ms{padding:11px 18px;background:var(--karol-g);border:1px solid var(--karol);border-radius:11px;color:var(--karol);font-family:var(--fn);font-size:14px;cursor:pointer;}
+.ci{display:flex;align-items:center;gap:12px;padding:13px;background:var(--s2);border:1px solid var(--bdr);border-radius:13px;cursor:pointer;transition:all .2s;margin-bottom:8px;}
+.ci:hover{border-color:var(--karol-g);}
+.ci.on{border-color:var(--karol);background:#00e09610;}
+
+/* CAJA */
+.caja-r{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:15px;}
+.caja-c{background:var(--s2);border:1px solid var(--bdr);border-radius:16px;padding:20px;text-align:center;}
+.caja-l{font-size:10px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px;}
+.caja-a{font-family:var(--dp);font-size:30px;letter-spacing:1px;}
+
+/* CHART */
+.chart{display:flex;align-items:flex-end;gap:7px;height:130px;padding:8px 0;}
+.cbw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;}
+.cb{width:100%;border-radius:5px 5px 0 0;min-height:4px;transition:height .6s;}
+.cbl{font-size:10px;color:var(--t2);font-weight:600;}
+.cv{font-size:10px;font-weight:700;}
+
+/* FACTOR */
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}
+.fb{padding:10px 12px;border-radius:11px;border:1px solid var(--bdr);background:var(--s2);cursor:pointer;transition:all .2s;text-align:center;}
+.fb.on{border-color:var(--karol);background:var(--karol-g);}
+
+/* SCHED ITEM */
+.si{background:var(--s2);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:8px;}
+
+/* PAGO DIARIO */
+.pago-card{background:var(--s2);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:10px;}
+.pago-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.pago-name{font-size:15px;font-weight:800;}
+.pago-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #25254033;}
+.pago-row:last-child{border-bottom:none;}
+.pago-total{font-family:var(--dp);font-size:24px;color:var(--karol);margin-top:8px;}
+.deuda-badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:var(--red-g);border:1px solid var(--red-g);color:var(--red);}
+
+/* ASISTENCIA */
+.asist-row{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--s2);border:1px solid var(--bdr);border-radius:12px;margin-bottom:8px;}
+.asist-btns{display:flex;gap:6px;}
+
+/* SESIONES ACTIVAS */
+.session-card{background:linear-gradient(135deg,#0a2a1a,#0a1a0a);border:1px solid var(--karol);border-radius:14px;padding:16px;margin-bottom:10px;display:flex;align-items:center;gap:16px;}
+.session-timer{font-family:var(--dp);font-size:32px;letter-spacing:2px;color:var(--karol);min-width:80px;text-align:center;}
+.session-timer.warning{color:var(--shak);}
+.session-timer.done{color:var(--red);}
+
+/* MISC */
+.succ{color:var(--karol);}.gold{color:var(--shak);}.dng{color:var(--red);}.pink{color:var(--adm);}
+@media(max-width:600px){.fr{grid-template-columns:1fr;}.main{padding:12px;}.sr{grid-template-columns:1fr 1fr;}.caja-r{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="load">
+  <div class="load-logo">SALESFLOW</div>
+  <div class="load-bar"><div class="load-fill"></div></div>
+  <div class="load-txt">OCULTUM v0.1 — conectando...</div>
+</div>
+
+<div id="toast"></div>
+
+<!-- LEVEL UP -->
+<div class="ov" id="ov-lu">
+  <div class="ovc" id="lu-card">
+    <span class="lu-ic" id="lu-ic">💎</span>
+    <div class="lu-ttl">¡SUBISTE!</div>
+    <div id="lu-rk" style="font-size:20px;font-weight:800;margin-bottom:6px;"></div>
+    <div id="lu-tg" style="font-size:13px;color:var(--t2);margin-bottom:24px;font-style:italic;"></div>
+    <button class="bsub" onclick="cov('ov-lu')" style="width:100%">¡A rifar! 🔥</button>
+  </div>
+</div>
+
+<!-- PENALTY -->
+<div class="ov" id="ov-pen">
+  <div class="ovc" style="background:linear-gradient(135deg,#1a0505,#0a0010);border:2px solid var(--red);box-shadow:0 0 60px #ff445544;">
+    <div style="font-size:72px">👶</div>
+    <div style="font-family:var(--dp);font-size:44px;color:var(--red);margin:12px 0 6px;">PENALIZADA</div>
+    <div id="pen-sub" style="font-size:14px;color:#ff8888;margin-bottom:4px;"></div>
+    <div style="font-size:13px;color:var(--t2);font-style:italic;margin-bottom:12px;">"Regresaste al rancho, mija 🤠"</div>
+    <div id="pen-mot" style="font-size:12px;color:var(--t2);margin-bottom:20px;"></div>
+    <button class="bsub" onclick="cov('ov-pen')" style="width:100%;border-color:var(--red);color:var(--red);">Ok, me lo merecí 😔</button>
+  </div>
+</div>
+
+<!-- CAL DAY -->
+<div class="ov" id="ov-cal">
+  <div class="ovc">
+    <div id="cal-dt" style="font-family:var(--dp);font-size:32px;margin-bottom:4px;"></div>
+    <div id="cal-sb" style="font-size:12px;color:var(--t2);margin-bottom:18px;"></div>
+    <div id="cal-ct"></div>
+    <button class="bsm" onclick="cov('ov-cal')" style="width:100%;margin-top:16px">Cerrar</button>
+  </div>
+</div>
+
+<!-- NOTIFS -->
+<div class="ov" id="ov-notifs" style="align-items:flex-start;justify-content:flex-end;padding:70px 16px 16px;">
+  <div class="notifs-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-size:15px;font-weight:800;">🔔 Notificaciones</div>
+      <div style="display:flex;gap:8px;">
+        <button class="bsm" onclick="markRead()">Leídas</button>
+        <button class="bsm br" onclick="cov('ov-notifs')">✕</button>
+      </div>
+    </div>
+    <div id="notifs-list"></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="scr-login" class="scr on">
+  <div class="lw">
+    <div class="logo">SALESFLOW</div>
+    <div class="ltag">el sistema de las duras</div>
+    <div class="lver">OCULTUM v0.1</div>
+    <div class="lbox">
+      <div class="tabs">
+        <button class="tab on" id="lt-v" onclick="ltab('v')">Vendedora</button>
+        <button class="tab" id="lt-a" onclick="ltab('a')">Admin</button>
+        <button class="tab" id="lt-r" onclick="ltab('r')">Registrarse</button>
+      </div>
+      <div id="lp-v">
+        <div class="f"><label>Tu código</label><input id="vc" placeholder="ej: VND001" autocomplete="off"></div>
+        <div class="f"><label>Contraseña</label><input id="vp" type="password" placeholder="••••"></div>
+        <button class="btn" onclick="loginV()">Entrar 🎤</button>
+      </div>
+      <div id="lp-a" style="display:none">
+        <div class="f"><label>Usuario</label><input id="au" value="admin" autocomplete="off"></div>
+        <div class="f"><label>Contraseña</label><input id="ap" type="password" placeholder="••••"></div>
+        <button class="btn ab" onclick="loginA()">Admin 👑</button>
+      </div>
+      <div id="lp-r" style="display:none">
+        <div class="f"><label>Nombre</label><input id="rn" placeholder="Nombre completo"></div>
+        <div class="f"><label>Código único</label><input id="rc" placeholder="ej: VND001" autocomplete="off"></div>
+        <div class="f"><label>Contraseña</label><input id="rp" type="password"></div>
+        <button class="btn" onclick="regV()">Crear cuenta 🌟</button>
+      </div>
+      <div class="err" id="lerr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- VENDEDORA -->
+<div id="scr-v" class="scr">
+  <div class="topbar">
+    <div class="tlogo">SALESFLOW</div>
+    <div class="tr">
+      <button class="bell" onclick="openNotifs()">🔔<span class="bcnt" id="vcnt" style="display:none">0</span></button>
+      <span id="vbdg" class="bdg bc"></span>
+      <span id="vnm" style="font-size:14px;font-weight:700;"></span>
+      <button class="bout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+  <div class="main">
+    <!-- INSIGNIA -->
+    <div class="ic">
+      <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+        <div class="ii" id="vii" style="border-color:var(--cazzu);--ic:var(--cazzu-g)"></div>
+        <div style="flex:1;min-width:180px">
+          <div style="font-family:var(--dp);font-size:36px;letter-spacing:2px;line-height:1;" id="vir" style="color:var(--cazzu)">La Cazzu</div>
+          <div style="font-size:13px;color:var(--t2);font-style:italic;margin:4px 0 10px;" id="vitg"></div>
+          <span style="display:inline-block;padding:4px 13px;border-radius:20px;font-size:12px;font-weight:700;border:1px solid;" id="vip">60%</span>
+        </div>
+      </div>
+      <div class="lvt"><div class="lvs" id="s1"></div><div class="lvs" id="s2"></div><div class="lvs" id="s3"></div></div>
+      <div class="lvl"><span>🎤 Cazzu</span><span>🐆 Karol G</span><span>💎 Shakira</span></div>
+      <div id="vpb" class="pb-ban" style="display:none">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+          <div style="font-size:28px">👶</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:800;color:var(--red)">La Pequeña Ángela</div>
+            <div style="font-size:12px;color:var(--t2)">"Regresaste al rancho, mija 🤠"</div>
+            <div class="pc" id="vpc">60%</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:5px">
+          <span style="color:var(--red);font-weight:700">Penalización activa</span>
+          <span id="vpcnt">0 días</span>
+        </div>
+        <div class="ppt"><div class="ppf" id="vppf" style="width:100%"></div></div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px;text-align:right" id="vpend"></div>
+      </div>
+      <div class="nh"><span>⬆️</span><span id="vnxt"></span></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="sr">
+      <div class="sc" style="--sc:var(--karol)"><div class="sl">Ganancia Hoy</div><div class="sv succ" id="vs1">Bs 0</div><div class="ss">del día</div></div>
+      <div class="sc" style="--sc:var(--shak)"><div class="sl">Total ganado</div><div class="sv gold" id="vs2">Bs 0</div><div class="ss">histórico</div></div>
+      <div class="sc" style="--sc:var(--adm)"><div class="sl">Propinas</div><div class="sv pink" id="vs3">Bs 0</div><div class="ss">a devolver hoy</div></div>
+      <div class="sc" style="--sc:var(--t2)"><div class="sl">Días trabajados</div><div class="sv" id="vs4">0</div></div>
+    </div>
+
+    <!-- ASISTENCIA STATUS -->
+    <div id="v-asist-status" style="display:none;margin-bottom:15px;"></div>
+
+    <!-- TIMER ACTIVO -->
+    <div id="v-timer-wrap" style="display:none;">
+      <div class="timer-card">
+        <div style="font-size:12px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Sesión activa</div>
+        <div class="timer-display" id="v-timer">00:00</div>
+        <div class="timer-vendor" id="v-timer-info"></div>
+      </div>
+    </div>
+
+    <div class="tnav">
+      <button class="tnb on" onclick="vtb('vt')">💰 Venta</button>
+      <button class="tnb" onclick="vtb('hi')">📋 Historial</button>
+      <button class="tnb" onclick="vtb('ho')">📅 Horario</button>
+      <button class="tnb" onclick="vtb('fa')">⚠️ Faltas</button>
+      <button class="tnb" onclick="vtb('ch')">💬 Chat</button>
+    </div>
+
+    <!-- VENTA -->
+    <div id="vt" class="tp on card">
+      <div class="ct"><div class="cd" style="background:var(--karol)"></div>Registrar venta</div>
+      <div class="fr">
+        <div class="f"><label>Monto (Bs)</label><input id="vam" type="number" min="0" placeholder="0.00"></div>
+        <div class="f"><label>Propina (Bs) — opcional</label><input id="vti" type="number" min="0" placeholder="0.00"></div>
+      </div>
+      <div class="f">
+        <label>Duración de la sesión</label>
+        <div class="dur-btns">
+          <button class="dur-btn" onclick="setDur(10)">10 min</button>
+          <button class="dur-btn" onclick="setDur(15)">15 min</button>
+          <button class="dur-btn" onclick="setDur(20)">20 min</button>
+          <button class="dur-btn" onclick="setDur(30)">30 min</button>
+          <button class="dur-btn" onclick="setDur(60)">60 min</button>
+          <input id="vdur" type="number" min="1" placeholder="otro..." style="width:80px;padding:8px 10px;background:var(--s2);border:1px solid var(--bdr);border-radius:9px;color:var(--txt);font-family:var(--fn);font-size:13px;outline:none;" oninput="setDurManual()">
+        </div>
+        <div style="font-size:11px;color:var(--t2);margin-top:6px">Seleccionado: <strong id="dur-selected" style="color:var(--karol)">—</strong></div>
+      </div>
+      <div class="f"><label>Método de pago</label>
+        <div class="pr"><div class="pb2 ef on" id="pef" onclick="spay('ef')">💵 Efectivo</div><div class="pb2 qr" id="pqr" onclick="spay('qr')">📱 QR</div></div>
+      </div>
+      <div class="f"><label>Cliente (opcional)</label>
+        <div class="fr">
+          <input id="vcln" placeholder="Nombre del cliente">
+          <input id="vclp" placeholder="Número de contacto" type="tel">
+        </div>
+      </div>
+      <div class="f"><label>Nota</label><input id="vno" placeholder="opcional..."></div>
+      <button class="bsub" onclick="regSale()">Registrar e iniciar sesión 🔥</button>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div id="hi" class="tp card">
+      <div class="ct"><div class="cd" style="background:var(--karol)"></div>Mis ventas</div>
+      <div class="tw"><table>
+        <thead><tr><th>Fecha</th><th>Hora</th><th>Duración</th><th>Ganancia</th><th>Propina</th><th>Método</th></tr></thead>
+        <tbody id="vhb"></tbody>
+      </table></div>
+    </div>
+
+    <!-- HORARIO -->
+    <div id="ho" class="tp card">
+      <div class="ct"><div class="cd" style="background:var(--shak)"></div>Proponer horario</div>
+      <div class="fr">
+        <div class="f"><label>Día</label>
+          <select id="vdy"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option></select>
+        </div>
+        <div class="f"><label>Entrada</label><input id="vin" type="time" value="09:00"></div>
+        <div class="f"><label>Salida</label><input id="vou" type="time" value="18:00"></div>
+      </div>
+      <button class="bsub" onclick="propSch()">Enviar propuesta 📅</button>
+      <div style="margin-top:18px"><div class="ct" style="margin-bottom:12px"><div class="cd" style="background:var(--t2)"></div>Mis propuestas</div><div id="vsch"></div></div>
+    </div>
+
+    <!-- FALTAS -->
+    <div id="fa" class="tp card">
+      <div class="ct"><div class="cd" style="background:var(--red)"></div>Justificar falta</div>
+      <div class="f"><label>Fecha de la falta</label><input id="vfd" type="date"></div>
+      <div class="f"><label>Motivo</label><input id="vfm" placeholder="Explica tu motivo..."></div>
+      <div style="font-size:12px;color:var(--t2);margin-bottom:12px">⚠️ Mínimo <strong style="color:var(--red)">24 horas de anticipación</strong></div>
+      <button class="bsub" style="border-color:var(--red);color:var(--red);" onclick="subFalta()">Enviar justificación</button>
+      <div style="margin-top:18px"><div class="ct" style="margin-bottom:12px"><div class="cd" style="background:var(--red)"></div>Mis faltas</div><div id="vfl"></div></div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="ch" class="tp">
+      <div class="card">
+        <div class="ct"><div class="cd" style="background:var(--adm)"></div>💬 Chat con Admin</div>
+        <div class="msgs" id="vca"></div>
+        <div class="mir"><input id="vma" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter')smV('admin')"><button class="ms" onclick="smV('admin')">➤</button></div>
+      </div>
+      <div class="card">
+        <div class="ct"><div class="cd" style="background:var(--karol)"></div>👥 Las Duras — Grupo</div>
+        <div class="msgs" id="vcg"></div>
+        <div class="mir"><input id="vmg" placeholder="Mensaje al grupo..." onkeydown="if(event.key==='Enter')smV('group')"><button class="ms" onclick="smV('group')">➤</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="scr-a" class="scr">
+  <div class="topbar">
+    <div class="tlogo">SALESFLOW</div>
+    <div class="tr">
+      <button class="bell" onclick="openNotifs()">🔔<span class="bcnt" id="acnt" style="display:none">0</span></button>
+      <span class="bdg bad">👑 ADMIN</span>
+      <button class="bout" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+  <div class="main">
+    <div class="sr">
+      <div class="sc" style="--sc:var(--karol)"><div class="sl">Ventas totales</div><div class="sv succ" id="as1">Bs 0</div></div>
+      <div class="sc" style="--sc:var(--shak)"><div class="sl">Mi ganancia hoy</div><div class="sv gold" id="as2">Bs 0</div></div>
+      <div class="sc" style="--sc:var(--adm)"><div class="sl">Comisiones</div><div class="sv pink" id="as3">Bs 0</div></div>
+      <div class="sc" style="--sc:var(--cazzu)"><div class="sl">Vendedoras</div><div class="sv" id="as4">0</div></div>
+    </div>
+
+    <div class="tnav">
+      <button class="tnb on" onclick="atb('eq')">🎤 Equipo</button>
+      <button class="tnb" onclick="atb('ses')">⏱️ Sesiones</button>
+      <button class="tnb" onclick="atb('pag')">💵 Pagos</button>
+      <button class="tnb" onclick="atb('vn')">📋 Ventas</button>
+      <button class="tnb" onclick="atb('ca')">📅 Horarios</button>
+      <button class="tnb" onclick="atb('cj')">🏦 Caja</button>
+      <button class="tnb" onclick="atb('pr')">🎯 Prob.</button>
+      <button class="tnb" onclick="atb('st')">📊 Stats</button>
+      <button class="tnb" onclick="atb('ac')">💬 Chat</button>
+      <button class="tnb" onclick="atb('cf')">⚙️ Config</button>
+    </div>
+
+    <!-- EQUIPO -->
+    <div id="eq" class="tp on">
+      <div class="card" style="margin-bottom:15px">
+        <div class="ct"><div class="cd" style="background:var(--shak)"></div>Asistencia de hoy</div>
+        <div id="asist-list"></div>
+      </div>
+      <div id="vgrid" class="vg"></div>
+    </div>
+
+    <!-- SESIONES ACTIVAS -->
+    <div id="ses" class="tp card">
+      <div class="ct"><div class="cd" style="background:var(--karol)"></div>Sesiones activas en tiempo real</div>
+      <div id="sessions-list"><div style="color:var(--t2);text-align:center;padding:20px">Sin sesiones activas</div></div>
+    </div>
+
+    <!-- PAGOS DEL DÍA -->
+    <div id="pag" class="tp card">
+      <div class="ct"><div class="cd" style="background:var(--shak)"></div>Pagos del día</div>
+      <div id="pagos-list"></div>
+    </div>
+
+    <!-- VENTAS -->
+    <div id="vn" class="tp card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+        <div class="ct" style="margin-bottom:0"><div class="cd" style="background:var(--karol)"></div>Todas las ventas</div>
+        <button class="bsm" onclick="exportXL()">📊 Excel</button>
+      </div>
+      <div id="dsum" style="margin-bottom:14px"></div>
+      <div class="tw"><table>
+        <thead><tr><th>Fecha</th><th>Hora</th><th>Vendedora</th><th>Nivel</th><th>Venta</th><th>Duración</th><th>Método</th><th>%</th><th>Comisión</th><th>Mi ganancia</th><th></th></tr></thead>
+        <tbody id="avb"></tbody>
+      </table></div>
+    </div>
+
+    <!-- HORARIOS -->
+    <div id="ca" class="tp card">
+      <div class="ct"><div class="cd" style="background:var(--shak)"></div>Calendario</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <button class="bsm" onclick="prevM()">◀</button>
+        <div id="calt" style="font-weight:800;font-size:15px"></div>
+        <button class="bsm" onclick="nextM()">▶</button>
+      </div>
+      <div class="cg" id="calh"></div>
+      <div class="cg" id="cald" style="margin-top:3px"></div>
+      <div style="margin-top:18px"><div class="ct" style="margin-bottom:12px"><div class="cd" style="background:var(--shak)"></div>Propuestas pendientes</div><div id="asch"></div></div>
+    </div>
+
+    <!-- CAJA -->
+    <div id="cj" class="tp">
+      <div class="caja-r">
+        <div class="caja-c"><div class="caja-l">💵 Caja Chica</div><div class="caja-a succ" id="cajas">Bs 0.00</div></div>
+        <div class="caja-c"><div class="caja-l">🏦 Banco</div><div class="caja-a gold" id="bancos">Bs 0.00</div></div>
+      </div>
+      <div class="card">
+        <div class="ct"><div class="cd" style="background:var(--karol)"></div>Nuevo movimiento</div>
+        <div class="fr">
+          <div class="f"><label>Tipo</label>
+            <select id="mt"><option value="ic">Ingreso → Caja</option><option value="ec">Egreso ← Caja</option><option value="ib">Ingreso → Banco</option><option value="eb">Egreso ← Banco</option></select>
+          </div>
+          <div class="f"><label>Monto (Bs)</label><input id="mm" type="number" min="0" placeholder="0.00"></div>
+        </div>
+        <div class="f"><label>Descripción</label><input id="md" placeholder="¿De qué es?"></div>
+        <div class="f"><label>Vendedora (si es adelanto)</label>
+          <select id="mv"><option value="">Sin vendedora asignada</option></select>
+        </div>
+        <button class="bsub" onclick="addMov()">Registrar</button>
+      </div>
+      <div class="card">
+        <div class="ct"><div class="cd" style="background:var(--karol)"></div>Historial</div>
+        <div class="tw"><table>
+          <thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Vendedora</th><th>Monto</th></tr></thead>
+          <tbody id="mh"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- PROBABILIDAD -->
+    <div id="pr" class="tp">
+      <div id="pdisp" style="margin-bottom:16px"></div>
+      <div class="card">
+        <div class="ct"><div class="cd" style="background:var(--adm)"></div>Factores del día</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:12px">La lluvia se puede actualizar en cualquier momento del día.</div>
+        <div class="fg" id="fg"></div>
+        <button class="bsub" style="margin-top:14px" onclick="saveAndCalcProb()">Guardar y calcular 🎯</button>
+      </div>
+      <div class="card">
+        <div class="ct"><div class="cd" style="background:var(--adm)"></div>📢 Aviso de publicación</div>
+        <div class="f"><label>Destinatario</label><select id="avd"></select></div>
+        <div class="f"><label>Plataforma</label><select id="avp"><option>📱 Telegram</option><option>📘 Facebook</option><option>👥 Grupos</option><option>Todas</option></select></div>
+        <div class="f"><label>Mensaje</label><textarea id="avm" rows="3" placeholder="Mensaje..."></textarea></div>
+        <button class="bsub" onclick="sendAviso()">Enviar 📢</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div id="st" class="tp card">
+      <div class="ct"><div class="cd" style="background:var(--adm)"></div>Ventas por día</div>
+      <div class="chart" id="chd"></div>
+      <div style="margin-top:22px">
+        <div class="ct"><div class="cd" style="background:var(--adm)"></div>Rendimiento — mejor primero</div>
+        <div class="tw"><table>
+          <thead><tr><th>#</th><th>Vendedora</th><th>Nivel</th><th>Sesiones</th><th>Total</th><th>Comisión</th></tr></thead>
+          <tbody id="pt"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="ac" class="tp">
+      <div class="card">
+        <div class="ct"><div class="cd" style="background:var(--adm)"></div>💬 Chats individuales</div>
+        <div id="acl"></div>
+        <div id="acw" style="display:none">
+          <div id="acwt" style="font-size:13px;font-weight:700;margin-bottom:10px;color:var(--t2)"></div>
+          <div class="msgs" id="acm"></div>
+          <div class="mir"><input id="ami" placeholder="Responder..." onkeydown="if(event.key==='Enter')smA()"><button class="ms" onclick="smA()">➤</button></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct"><div class="cd" style="background:var(--karol)"></div>👥 Las Duras — Grupo</div>
+        <div class="msgs" id="acg"></div>
+        <div class="mir"><input id="amg" placeholder="Mensaje al grupo..." onkeydown="if(event.key==='Enter')smAG()"><button class="ms" onclick="smAG()">➤</button></div>
+      </div>
+    </div>
+
+    <!-- CONFIG -->
+    <div id="cf" class="tp card">
+      <div class="ct"><div class="cd" style="background:var(--adm)"></div>Configuración</div>
+      <div class="fr">
+        <div class="f"><label>Nueva contraseña admin</label><input id="apass" type="password" placeholder="nueva contraseña"></div>
+        <div class="f"><label>Confirmar contraseña</label><input id="apass2" type="password" placeholder="repetir contraseña"></div>
+      </div>
+      <button class="bsub" onclick="saveCfg()">Cambiar contraseña ✅</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import{createClient}from'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const sb=createClient(
+  'https://agusprmzqsggwcuopjbz.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFndXNwcm16cXNnZ3djdW9wamJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDEzMjMsImV4cCI6MjA5NTE3NzMyM30.UcMHMQFPat-S3vvbU9VkNKKlNfL2Fq75QQB8TAiyE6M'
+);
+
+// ─── CONSTANTS ───
+const LV=[
+  {n:'La Cazzu',  i:'🎤',p:60,t:'"Underground pero con flow"',c:'cazzu', ao:0,  ac:100},
+  {n:'La Karol G',i:'🐆',p:65,t:'"Ya pegó, ya es conocida"', c:'karol', ao:60, ac:40},
+  {n:'La Shakira',i:'💎',p:70,t:'"Intocable. La leyenda."',  c:'shakira',ao:100,ac:0},
+];
+const FD=[
+  {k:'bloqueo', i:'🚧',l:'Bloqueo',        o:['Sin bloqueo','Departamental','Nacional']},
+  {k:'dolar',   i:'💵',l:'Dólar',           o:['Estable','Subida leve','Subida fuerte']},
+  {k:'gasolina',i:'⛽',l:'Gasolina',        o:['Normal','Escasez leve','Escasez grave']},
+  {k:'lluvia',  i:'🌧️',l:'Lluvia (por franja)',o:['Sin lluvia','Leve','Fuerte']},
+  {k:'feriado', i:'📅',l:'Tipo de día',    o:['Normal','Feriado','Festivo']},
+  {k:'primerV', i:'🏪',l:'Primer viernes', o:['No','Sí']},
+  {k:'momento', i:'📆',l:'Momento del mes',o:['Normal','Inicio/Fin','Quincena']},
+  {k:'vNueva',  i:'👩‍💼',l:'Vendedora nueva',o:['No','Sí (boost ventas)']},
+];
+
+// ─── STATE ───
+let ME=null,ROLE=null,PAY='ef',DUR=null;
+let VV=[],SS=[],SH=[],FA=[],NO=[],MV=[];
+let CAJA=0,BANCO=0;
+let CY=new Date().getFullYear(),CM=new Date().getMonth();
+let ACHAT=null;
+let FAC={bloqueo:0,dolar:0,gasolina:0,lluvia:0,feriado:0,primerV:0,momento:0,vNueva:0};
+const NOW=new Date();
+let POLL=null,TIMER_INT=null;
+let LAST_LVL=null,LAST_PEN=null;
+let ACTIVE_SESSIONS={}; // {vcode: {endTime, vendorName, duration}}
+let ADMIN_PASS='1234';
+
+// ─── UTILS ───
+const $=id=>document.getElementById(id);
+const fmt=n=>'Bs '+Number(n).toFixed(2);
+const fd=d=>new Date(d).toLocaleDateString('es-BO',{day:'2-digit',month:'short',year:'numeric'});
+const ft=d=>new Date(d).toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit',timeZone:'America/La_Paz'});
+const fdt=d=>`${fd(d)} ${ft(d)}`;
+const dateToBolivia=d=>new Date(new Date(d).toLocaleString('en-US',{timeZone:'America/La_Paz'}));
+const saleDate=s=>{ const d=dateToBolivia(s.date); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const todayStr=()=>{const d=new Date(new Date().toLocaleString('en-US',{timeZone:'America/La_Paz'}));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+const calc=s=>{if(s.annulled)return{e:0,n:0,m:0};const l=LV[s.level];const e=s.amount*l.p/100;return{e,n:e+(s.tip||0),m:s.amount-e};};
+const inP=v=>v.pen_end&&new Date(v.pen_end)>NOW;
+const pLeft=v=>v.pen_end?Math.max(0,Math.ceil((new Date(v.pen_end)-NOW)/864e5)):0;
+const eL=v=>inP(v)?Math.max(0,v.level-1):v.level;
+
+function toast(msg,col='var(--karol)'){
+  const e=$('toast');e.textContent=msg;e.style.borderColor=col;
+  e.classList.add('on');setTimeout(()=>e.classList.remove('on'),3200);
+}
+function oov(id){$(id).classList.add('on');}
+function cov(id){$(id).classList.remove('on');}
+window.cov=cov;
+
+// ─── SESSION STORAGE ───
+function saveSession(){
+  if(ME&&ROLE==='vendor') sessionStorage.setItem('sf_session',JSON.stringify({role:'vendor',code:ME.code}));
+  else if(ROLE==='admin') sessionStorage.setItem('sf_session',JSON.stringify({role:'admin'}));
+}
+function clearSession(){sessionStorage.removeItem('sf_session');}
+
+// ─── NOTIFS ───
+function addN(to,icon,title,msg){
+  NO.push({id:Date.now()+Math.random(),to,icon,title,msg,read:false,date:new Date().toISOString()});
+  updNC();
+}
+function updNC(){
+  const t=ROLE==='admin'?'admin':ME?.code;
+  const u=NO.filter(n=>(n.to===t||n.to==='all')&&!n.read).length;
+  const el=ROLE==='admin'?$('acnt'):$('vcnt');
+  if(el){el.style.display=u>0?'flex':'none';el.textContent=u;}
+}
+window.openNotifs=function(){
+  const t=ROLE==='admin'?'admin':ME?.code;
+  const myN=NO.filter(n=>n.to===t||n.to==='all').reverse();
+  $('notifs-list').innerHTML=myN.length===0?'<div style="color:var(--t2);text-align:center;padding:20px">Sin notificaciones</div>':
+    myN.map(n=>`<div class="ni ${n.read?'':'u'}" onclick="rN(${n.id})" style="cursor:pointer">
+      <div style="font-size:22px">${n.icon}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;margin-bottom:3px">${n.title}</div>
+        <div style="font-size:12px;color:var(--t2)">${n.msg}</div>
+        <div style="font-size:10px;color:var(--t3);margin-top:4px">${fdt(n.date)}</div>
+      </div>
+    </div>`).join('');
+  oov('ov-notifs');
+};
+window.rN=function(id){const n=NO.find(x=>x.id===id);if(n)n.read=true;updNC();window.openNotifs();};
+window.markRead=function(){const t=ROLE==='admin'?'admin':ME?.code;NO.filter(n=>n.to===t||n.to==='all').forEach(n=>n.read=true);updNC();window.openNotifs();};
+
+// ─── SHOW SCREEN ───
+function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+
+// ─── POLLING ───
+function startPoll(){
+  if(POLL)clearInterval(POLL);
+  POLL=setInterval(async()=>{
+    try{
+      if(ROLE==='vendor'&&ME) await pollV();
+      else if(ROLE==='admin') await pollA();
+    }catch(e){console.warn('Poll error:',e);}
+  },4000);
+}
+function stopPoll(){if(POLL){clearInterval(POLL);POLL=null;}}
+
+async function pollV(){
+  const{data:vd}=await sb.from('vendors').select('*').eq('code',ME.code).single();
+  if(!vd)return;
+  const lvlChanged=vd.level!==LAST_LVL&&LAST_LVL!==null;
+  const penApplied=vd.pen_end&&vd.pen_end!==LAST_PEN&&!vd.seen_penalty;
+  if(lvlChanged){
+    ME=vd;LAST_LVL=vd.level;LAST_PEN=vd.pen_end;
+    if(vd.level>(LAST_LVL||0)){showLU(vd);addN(ME.code,'⬆️','¡Subiste de nivel!',`Ahora eres ${LV[vd.level].n} ${LV[vd.level].i}`);}
+    else{toast('⬇ Tu nivel fue modificado','var(--red)');}
+    renderV();return;
+  }
+  if(penApplied){
+    ME=vd;LAST_PEN=vd.pen_end;LAST_LVL=vd.level;
+    $('pen-sub').textContent=`${vd.name} — ahora en ${LV[eL(vd)].n} (${LV[eL(vd)].p}%)`;
+    $('pen-mot').textContent=vd.pen_motivo?`Motivo: ${vd.pen_motivo}`:'';
+    const op=$('ov-pen');op.classList.add('shake');setTimeout(()=>op.classList.remove('shake'),500);
+    oov('ov-pen');
+    await sb.from('vendors').update({seen_penalty:true}).eq('code',ME.code);
+    ME.seen_penalty=true;renderV();return;
+  }
+  ME=vd;LAST_LVL=vd.level;LAST_PEN=vd.pen_end;
+  const[s,sc,fa]=await Promise.all([
+    sb.from('sales').select('*').eq('vcode',ME.code).order('date',{ascending:false}),
+    sb.from('schedules').select('*').eq('vcode',ME.code).order('created_at',{ascending:false}),
+    sb.from('absences').select('*').eq('vcode',ME.code).order('created_at',{ascending:false}),
+  ]);
+  SS=s.data||[];SH=sc.data||[];FA=fa.data||[];
+  updateVStats();
+  const atab=document.querySelector('#scr-v .tnb.on');
+  if(atab){
+    const t=atab.textContent;
+    if(t.includes('Historial'))renderVHist();
+    if(t.includes('Horario'))renderVSch();
+    if(t.includes('Faltas'))renderVFa();
+    if(t.includes('Chat')){
+      await loadChat(`admin_${ME.code}`,$('vca'),ME.code);
+      await loadChat('group',$('vcg'),ME.code);
+    }
+  }
+  updNC();
+}
+
+async function pollA(){
+  const[v,s,sc,fa,mo]=await Promise.all([
+    sb.from('vendors').select('*').order('created_at',{ascending:true}),
+    sb.from('sales').select('*').order('date',{ascending:false}),
+    sb.from('schedules').select('*').order('created_at',{ascending:false}),
+    sb.from('absences').select('*').order('submitted',{ascending:false}),
+    sb.from('movements').select('*').order('date',{ascending:false}),
+  ]);
+  VV=v.data||[];SS=s.data||[];SH=sc.data||[];FA=fa.data||[];MV=mo.data||[];
+  CAJA=0;BANCO=0;
+  MV.forEach(m=>{if(m.tipo==='ic')CAJA+=m.monto;else if(m.tipo==='ec')CAJA-=m.monto;else if(m.tipo==='ib')BANCO+=m.monto;else BANCO-=m.monto;});
+  updateAStats();
+  const atab=document.querySelector('#scr-a .tnb.on');
+  if(atab){
+    const t=atab.textContent;
+    if(t.includes('Equipo')){renderVG();renderAsist();}
+    if(t.includes('Sesiones'))renderSessions();
+    if(t.includes('Pagos'))renderPagos();
+    if(t.includes('Ventas'))renderAV();
+    if(t.includes('Horarios')){renderCal();renderASch();}
+    if(t.includes('Caja'))renderCaja();
+    if(t.includes('Stats'))renderStats();
+    if(t.includes('Chat')){
+      renderAChat();
+      if(ACHAT)await loadChat(`admin_${ACHAT}`,$('acm'),'admin');
+      await loadChat('group',$('acg'),'admin');
+    }
+  }
+  updNC();
+}
+
+// ─── LOGIN ───
+window.ltab=function(t){
+  ['v','a','r'].forEach(x=>{$('lt-'+x).classList.toggle('on',x===t);$('lp-'+x).style.display=x===t?'block':'none';});
+  $('lerr').textContent='';
+};
+
+window.loginV=async function(){
+  const code=$('vc').value.trim().toUpperCase(),pass=$('vp').value;
+  if(!code||!pass){$('lerr').textContent='⚠️ Completa todos los campos';return;}
+  $('lerr').textContent='Verificando...';
+  const{data,error}=await sb.from('vendors').select('*').eq('code',code).eq('pass',pass).single();
+  if(error||!data){$('lerr').textContent='❌ Código o contraseña incorrectos';return;}
+  if(data.active===false){$('lerr').textContent='❌ Tu cuenta está desactivada';return;}
+  ME=data;ROLE='vendor';LAST_LVL=data.level;LAST_PEN=data.pen_end;
+  await loadVD();saveSession();show('scr-v');renderV();updNC();startPoll();
+  if(inP(ME)&&!ME.seen_penalty){
+    $('pen-sub').textContent=`${ME.name} — ahora en ${LV[eL(ME)].n} (${LV[eL(ME)].p}%)`;
+    $('pen-mot').textContent=ME.pen_motivo?`Motivo: ${ME.pen_motivo}`:'';
+    const op=$('ov-pen');op.classList.add('shake');setTimeout(()=>op.classList.remove('shake'),500);
+    oov('ov-pen');
+    await sb.from('vendors').update({seen_penalty:true}).eq('code',ME.code);
+    ME.seen_penalty=true;
+  }
+};
+
+window.loginA=async function(){
+  if($('au').value.trim()==='admin'&&$('ap').value===ADMIN_PASS){
+    ROLE='admin';ME=null;
+    await loadAD();saveSession();show('scr-a');renderA();updNC();startPoll();
+  }else{$('lerr').textContent='❌ Usuario o contraseña incorrectos';}
+};
+
+window.regV=async function(){
+  const name=$('rn').value.trim(),code=$('rc').value.trim().toUpperCase(),pass=$('rp').value;
+  if(!name||!code||!pass){$('lerr').textContent='⚠️ Completa todos los campos';return;}
+  $('lerr').textContent='Creando cuenta...';
+  const{data:ex}=await sb.from('vendors').select('code').eq('code',code).single();
+  if(ex){$('lerr').textContent='❌ Ese código ya existe';return;}
+  const{data,error}=await sb.from('vendors').insert({
+    code,name,pass,level:0,days:0,pen_end:null,pen_total:0,
+    pen_motivo:'',prev_lvl:0,seen_penalty:true,credits:0,
+    active:true,is_new:true,debt:0
+  }).select().single();
+  if(error){$('lerr').textContent='❌ Error: '+error.message;return;}
+  ME=data;ROLE='vendor';LAST_LVL=0;LAST_PEN=null;
+  await loadVD();saveSession();show('scr-v');renderV();updNC();startPoll();
+};
+
+window.doLogout=function(){
+  stopPoll();stopTimer();clearSession();
+  ME=null;ROLE=null;VV=[];SS=[];SH=[];FA=[];NO=[];MV=[];
+  LAST_LVL=null;LAST_PEN=null;ACHAT=null;DUR=null;
+  ['vc','vp','ap'].forEach(id=>$(id).value='');
+  $('lerr').textContent='';window.ltab('v');show('scr-login');
+};
+
+// ─── AUTO RESTORE SESSION ───
+async function tryRestoreSession(){
+  const saved=sessionStorage.getItem('sf_session');
+  if(!saved)return;
+  try{
+    const s=JSON.parse(saved);
+    if(s.role==='admin'){
+      ROLE='admin';await loadAD();show('scr-a');renderA();updNC();startPoll();
+    } else if(s.role==='vendor'&&s.code){
+      const{data}=await sb.from('vendors').select('*').eq('code',s.code).single();
+      if(data&&data.active!==false){
+        ME=data;ROLE='vendor';LAST_LVL=data.level;LAST_PEN=data.pen_end;
+        await loadVD();show('scr-v');renderV();updNC();startPoll();
+      } else clearSession();
+    }
+  }catch(e){clearSession();}
+}
+
+// ─── LOAD DATA ───
+async function loadVD(){
+  const[s,sc,fa]=await Promise.all([
+    sb.from('sales').select('*').eq('vcode',ME.code).order('date',{ascending:false}),
+    sb.from('schedules').select('*').eq('vcode',ME.code).order('created_at',{ascending:false}),
+    sb.from('absences').select('*').eq('vcode',ME.code).order('created_at',{ascending:false}),
+  ]);
+  SS=s.data||[];SH=sc.data||[];FA=fa.data||[];
+}
+
+async function loadAD(){
+  const[v,s,sc,fa,mo]=await Promise.all([
+    sb.from('vendors').select('*').order('created_at',{ascending:true}),
+    sb.from('sales').select('*').order('date',{ascending:false}),
+    sb.from('schedules').select('*').order('created_at',{ascending:false}),
+    sb.from('absences').select('*').order('submitted',{ascending:false}),
+    sb.from('movements').select('*').order('date',{ascending:false}),
+  ]);
+  VV=v.data||[];SS=s.data||[];SH=sc.data||[];FA=fa.data||[];MV=mo.data||[];
+  CAJA=0;BANCO=0;
+  MV.forEach(m=>{if(m.tipo==='ic')CAJA+=m.monto;else if(m.tipo==='ec')CAJA-=m.monto;else if(m.tipo==='ib')BANCO+=m.monto;else BANCO-=m.monto;});
+}
+
+// ─── VENDOR RENDER ───
+function renderV(){
+  const v=ME,lv=eL(v),l=LV[lv],pen=inP(v);
+  $('vbdg').textContent=pen?'👶 Penalizada':l.i+' '+l.n;
+  $('vbdg').className='bdg '+getBadgeClass(l.c);
+  $('vnm').textContent=v.name;
+  const ii=$('vii');ii.textContent=pen?'👶':l.i;
+  ii.style.borderColor=`var(--${l.c})`;ii.style.setProperty('--ic',`var(--${l.c}-g)`);
+  $('vir').textContent=pen?'La Pequeña Ángela':l.n;$('vir').style.color=`var(--${l.c})`;
+  $('vitg').textContent=pen?'"Regresaste al rancho, mija 🤠"':l.t;
+  $('vip').textContent=l.p+'% comisión';
+  $('vip').style.borderColor=`var(--${l.c})`;$('vip').style.color=`var(--${l.c})`;
+  ['s1','s2','s3'].forEach((id,i)=>{
+    const e=$(id);e.className='lvs'+(i<=lv?' on':'');
+    if(i<=lv)e.style.setProperty('--sc',`var(--${l.c})`);
+  });
+  $('vpb').style.display=pen?'block':'none';
+  if(pen){
+    $('vpc').textContent=`Comisión actual: ${LV[eL(v)].p}%`;
+    const left=pLeft(v),tot=v.pen_total||1;
+    $('vpcnt').textContent=`${left} día${left!==1?'s':''} restantes`;
+    $('vppf').style.width=Math.round((left/tot)*100)+'%';
+    $('vpend').textContent=`Termina: ${fd(v.pen_end)}`;
+  }
+  $('vnxt').innerHTML=['1 mes → 🐆 La Karol G (65%)','2 meses más → 💎 La Shakira (70%)','💎 Nivel máximo — Eres La Leyenda'][v.level];
+  // Asistencia status
+  const asistEl=$('v-asist-status');
+  const todaySales=SS.filter(s=>s.date&&!s.annulled&&saleDate(s)===todayStr());
+  // Check if marked present today
+  updateVStats();renderVHist();renderVSch();renderVFa();
+}
+
+function getBadgeClass(c){
+  const map={cazzu:'bc',karol:'bk',shakira:'bs2'};
+  return map[c]||'bc';
+}
+
+function updateVStats(){
+  const todayEarn=SS.filter(s=>s.date&&s.date.startsWith(todayStr())).reduce((a,s)=>a+calc(s).e,0);
+  const totalEarn=SS.reduce((a,s)=>a+calc(s).e,0);
+  const todayTips=SS.filter(s=>s.date&&s.date.startsWith(todayStr())).reduce((a,s)=>a+(s.tip||0),0);
+  $('vs1').textContent=fmt(todayEarn);
+  $('vs2').textContent=fmt(totalEarn);
+  $('vs3').textContent=fmt(todayTips);
+  $('vs4').textContent=ME?.days||0;
+}
+
+function renderVHist(){
+  $('vhb').innerHTML=SS.map(s=>{const c=calc(s);
+    return`<tr>
+      <td>${fd(s.date)}</td>
+      <td>${ft(s.date)}</td>
+      <td>${s.duration?s.duration+' min':'—'}</td>
+      <td class="succ">${fmt(c.e)}</td>
+      <td>${s.tip>0?`<span class="gold">${fmt(s.tip)}</span> <span style="font-size:10px;color:var(--t2)">(devolver)</span>`:'—'}</td>
+      <td>${s.pay==='ef'?'💵':'📱'}</td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--t2);padding:20px">Sin ventas aún</td></tr>';
+}
+
+// ─── DURATION ───
+window.setDur=function(min){
+  DUR=min;
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
+  event.target.classList.add('on');
+  $('vdur').value='';
+  $('dur-selected').textContent=min+' minutos';
+};
+window.setDurManual=function(){
+  const v=parseInt($('vdur').value);
+  if(v>0){
+    DUR=v;
+    document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
+    $('dur-selected').textContent=v+' minutos (manual)';
+  }
+};
+
+// ─── TIMER ───
+function startTimer(durationMin,vendorName){
+  stopTimer();
+  const endTime=Date.now()+durationMin*60000;
+  ACTIVE_SESSIONS[ME?.code||'vendor']={endTime,vendorName,duration:durationMin,startTime:Date.now()};
+  $('v-timer-wrap').style.display='block';
+  let warned=false;
+  TIMER_INT=setInterval(()=>{
+    const left=endTime-Date.now();
+    if(left<=0){
+      $('v-timer').textContent='00:00';
+      $('v-timer').className='timer-display done';
+      $('v-timer-info').textContent='Sesión terminada';
+      stopTimer();
+      toast('⏰ Sesión terminada','var(--red)');
+      addN('admin','⏰','Sesión terminada',`${vendorName} terminó su sesión de ${durationMin} min`);
+      delete ACTIVE_SESSIONS[ME?.code||'vendor'];
+      return;
+    }
+    const m=Math.floor(left/60000),s=Math.floor((left%60000)/1000);
+    $('v-timer').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(left<=300000&&!warned){
+      warned=true;
+      $('v-timer').className='timer-display warning';
+      toast('⚠️ Faltan 5 minutos para terminar la sesión','var(--shak)');
+      addN('admin','⚠️','5 minutos restantes',`${vendorName} — sesión de ${durationMin} min casi termina`);
+    }
+    $('v-timer-info').textContent=`Sesión activa — ${vendorName}`;
+  },1000);
+}
+function stopTimer(){if(TIMER_INT){clearInterval(TIMER_INT);TIMER_INT=null;}}
+
+// ─── PAY ───
+window.spay=function(p){
+  PAY=p;
+  $('pef').className='pb2 ef'+(p==='ef'?' on':'');
+  $('pqr').className='pb2 qr'+(p==='qr'?' on':'');
+};
+
+// ─── REGISTER SALE ───
+window.regSale=async function(){
+  const amt=parseFloat($('vam').value);
+  if(!amt||amt<=0){toast('Ingresa un monto válido','var(--red)');return;}
+  if(!DUR){toast('Selecciona la duración de la sesión','var(--red)');return;}
+  const tip=parseFloat($('vti').value)||0;
+  const note=$('vno').value;
+  const clientName=$('vcln').value.trim();
+  const clientPhone=$('vclp').value.trim();
+  // Check days worked — only count once per calendar day
+  const todaySales=SS.filter(s=>s.date&&!s.annulled&&saleDate(s)===todayStr());
+  const isNewDay=todaySales.length===0;
+  const saleData={
+    vcode:ME.code,vname:ME.name,level:eL(ME),
+    amount:amt,tip,pay:PAY,note,duration:DUR,
+    date:new Date().toISOString(),
+    client_name:clientName||null,client_phone:clientPhone||null
+  };
+  const{data,error}=await sb.from('sales').insert(saleData).select().single();
+  if(error){toast('Error al registrar: '+error.message,'var(--red)');return;}
+  SS.unshift(data);
+  // Update days only if first sale today
+  if(isNewDay){
+    ME.days=(ME.days||0)+1;
+    // Check if 15 days worked — remove new status
+    const updates={days:ME.days};
+    if(ME.is_new&&ME.days>=15)updates.is_new=false;
+    await sb.from('vendors').update(updates).eq('code',ME.code);
+  }
+  // Notify admin if client registered
+  if(clientName||clientPhone){
+    addN('admin','👤','Nueva cliente registrada',`${clientName||'Sin nombre'} — ${clientPhone||'Sin número'}`);
+  }
+  // Start timer
+  startTimer(DUR,ME.name);
+  // Reset form
+  $('vam').value='';$('vti').value='';$('vno').value='';
+  $('vcln').value='';$('vclp').value='';$('vdur').value='';DUR=null;
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
+  $('dur-selected').textContent='—';
+  toast('✅ Venta registrada — sesión iniciada 🔥','var(--karol)');
+  updateVStats();renderVHist();
+};
+
+window.propSch=async function(){
+  const day=$('vdy').value,inn=$('vin').value,out=$('vou').value;
+  const ex=SH.find(s=>s.vcode===ME.code&&s.day===day&&s.status==='pending');
+  if(ex){toast('Ya tienes propuesta pendiente para ese día','var(--red)');return;}
+  const{data,error}=await sb.from('schedules').insert({
+    vcode:ME.code,vname:ME.name,day,time_in:inn,time_out:out,status:'pending',date:new Date().toISOString()
+  }).select().single();
+  if(error){toast('Error','var(--red)');return;}
+  SH.unshift(data);toast('📅 Propuesta enviada','var(--shak)');renderVSch();
+};
+
+window.cancelSch=async function(id){
+  const s=SH.find(x=>x.id===id);
+  if(!s||s.status==='approved'){toast('No puedes cancelar un turno aprobado','var(--red)');return;}
+  await sb.from('schedules').update({status:'cancelled'}).eq('id',id);
+  s.status='cancelled';toast('✕ Cancelada','var(--t2)');renderVSch();
+};
+
+function renderVSch(){
+  $('vsch').innerHTML=SH.filter(s=>s.status!=='cancelled').map(s=>`
+    <div class="si">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div><strong>${s.day}</strong> <span style="color:var(--t2)">${s.time_in}–${s.time_out}</span></div>
+        <span class="bdg ${s.status==='approved'?'bk':s.status==='rejected'?'ba':'bad'}">
+          ${s.status==='approved'?'✓ Aprobado':s.status==='rejected'?'✗ Rechazado':'⏳ Pendiente'}
+        </span>
+      </div>
+      ${s.status==='pending'?`<div style="margin-top:10px"><button class="bsm br" onclick="cancelSch('${s.id}')">✕ Cancelar</button></div>`:''}
+    </div>`).join('')||'<div style="color:var(--t2);font-size:13px">Sin propuestas aún</div>';
+}
+
+window.subFalta=async function(){
+  const d=$('vfd').value,m=$('vfm').value.trim();
+  if(!d||!m){toast('Completa todos los campos','var(--red)');return;}
+  if((new Date(d)-NOW)/3600000<24){toast('"Fuera de tiempo, mija 🤠" — Mínimo 24hrs antes','var(--red)');return;}
+  const{data,error}=await sb.from('absences').insert({
+    vcode:ME.code,vname:ME.name,date:d,motivo:m,status:'pending',submitted:new Date().toISOString()
+  }).select().single();
+  if(error){toast('Error','var(--red)');return;}
+  FA.unshift(data);$('vfd').value='';$('vfm').value='';
+  toast('⚠️ Justificación enviada','var(--shak)');renderVFa();
+};
+
+function renderVFa(){
+  $('vfl').innerHTML=FA.map(f=>`
+    <div class="ir">
+      <div><span class="ik">${fd(f.date)}</span><div style="font-size:12px;color:var(--t2);margin-top:2px">${f.motivo}</div></div>
+      <span class="bdg ${f.status==='approved'?'bk':f.status==='rejected'?'ba':'bad'}">
+        ${f.status==='approved'?'✓ Aprobada':f.status==='rejected'?'✗ Rechazada':'⏳ Pendiente'}
+      </span>
+    </div>`).join('')||'<div style="color:var(--t2);font-size:13px">Sin faltas</div>';
+}
+
+// ─── CHAT ───
+async function loadChat(key,cont,myCode){
+  if(!cont)return;
+  const{data}=await sb.from('messages').select('*').eq('chat_key',key).order('time',{ascending:true}).limit(100);
+  const list=data||[];
+  cont.innerHTML=list.length===0?'<div style="color:var(--t2);font-size:12px;text-align:center;padding:20px">Sin mensajes aún</div>':
+    list.map(m=>`<div class="msg ${m.from_code===myCode?'me':'them'}">
+      ${m.from_code!==myCode?`<div class="mn">${m.from_name}</div>`:''}
+      ${m.text}<div class="mt">${ft(m.time)}</div>
+    </div>`).join('');
+  cont.scrollTop=cont.scrollHeight;
+}
+
+window.smV=async function(type){
+  const iid=type==='admin'?'vma':'vmg';
+  const txt=$(iid).value.trim();if(!txt)return;
+  const key=type==='admin'?`admin_${ME.code}`:'group';
+  await sb.from('messages').insert({chat_key:key,from_code:ME.code,from_name:ME.name,text:txt,time:new Date().toISOString()});
+  $(iid).value='';
+  await loadChat(key,type==='admin'?$('vca'):$('vcg'),ME.code);
+  if(type==='admin')addN('admin','💬','Mensaje de '+ME.name,txt.slice(0,50));
+};
+
+window.vtb=function(t){
+  const tabs=['vt','hi','ho','fa','ch'];
+  tabs.forEach((x,i)=>{$(x).classList.toggle('on',x===t);document.querySelectorAll('#scr-v .tnb')[i].classList.toggle('on',x===t);});
+  if(t==='ch'){loadChat(`admin_${ME.code}`,$('vca'),ME.code);loadChat('group',$('vcg'),ME.code);}
+};
+
+// ─── ADMIN RENDER ───
+function renderA(){
+  updateAStats();
+  renderVG();renderAsist();renderAV();renderCal();renderASch();
+  renderCaja();renderAviDest();renderSessions();renderPagos();
+}
+
+function updateAStats(){
+  const td=SS.filter(s=>s.date&&s.date.startsWith(todayStr()));
+  const tdE=td.reduce((a,s)=>a+calc(s).m,0);
+  let ts=0,tc=0;SS.forEach(s=>{const c=calc(s);ts+=s.amount;tc+=c.e;});
+  $('as1').textContent=fmt(ts);$('as2').textContent=fmt(tdE);
+  $('as3').textContent=fmt(tc);$('as4').textContent=VV.length;
+}
+
+// ─── ASISTENCIA ───
+function renderAsist(){
+  const today=todayStr();
+  // Vendedoras que ya registraron venta hoy = presentes
+  const presentToday=new Set(SS.filter(s=>s.date&&s.date.startsWith(today)).map(s=>s.vcode));
+  $('asist-list').innerHTML=VV.filter(v=>v.active!==false).map(v=>{
+    const isPresent=presentToday.has(v.code);
+    return`<div class="asist-row">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:20px">${LV[eL(v)].i}</div>
+        <div>
+          <div style="font-weight:700;font-size:14px">${v.name}</div>
+          <div style="font-size:11px;color:var(--t2)">${v.days} dias trabajados</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${isPresent
+          ?'<span class="bdg bk">✓ Presente hoy</span>'
+          :`<button class="bsm bg" onclick="marcarPresente('${v.code}')">✓ Marcar presente</button>`
+        }
+      </div>
+    </div>`;
+  }).join('')||'<div style="color:var(--t2);font-size:13px">Sin vendedoras</div>';
+}
+
+// ─── SESIONES ACTIVAS ───
+function renderSessions(){
+  const sessions=Object.entries(ACTIVE_SESSIONS);
+  if(sessions.length===0){
+    $('sessions-list').innerHTML='<div style="color:var(--t2);text-align:center;padding:20px">Sin sesiones activas en este momento</div>';
+    return;
+  }
+  $('sessions-list').innerHTML=sessions.map(([code,ses])=>{
+    const left=Math.max(0,ses.endTime-Date.now());
+    const m=Math.floor(left/60000),s=Math.floor((left%60000)/1000);
+    const timeStr=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const warning=left<300000;
+    return`<div class="session-card">
+      <div class="session-timer ${warning?'warning':''}">${timeStr}</div>
+      <div>
+        <div style="font-size:15px;font-weight:800">${ses.vendorName}</div>
+        <div style="font-size:12px;color:var(--t2)">Sesión de ${ses.duration} min</div>
+        ${warning?'<div style="font-size:11px;color:var(--shak);font-weight:700">⚠️ Menos de 5 min</div>':''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── PAGOS DEL DÍA ───
+function renderPagos(){
+  const today=todayStr();
+  const todaySales=SS.filter(s=>s.date&&s.date.startsWith(today));
+  // Group by vendor
+  const byVendor={};
+  todaySales.forEach(s=>{
+    if(!byVendor[s.vcode])byVendor[s.vcode]={name:s.vname,sales:[],tips:0,earn:0};
+    const c=calc(s);
+    byVendor[s.vcode].sales.push(s);
+    byVendor[s.vcode].tips+=(s.tip||0);
+    byVendor[s.vcode].earn+=c.e;
+  });
+  // Add debt from movements
+  const todayMovs=MV.filter(m=>m.date&&m.date.startsWith(today)&&m.vendor_code);
+  if(Object.keys(byVendor).length===0&&todayMovs.length===0){
+    $('pagos-list').innerHTML='<div style="color:var(--t2);text-align:center;padding:20px">Sin ventas registradas hoy</div>';
+    return;
+  }
+  // Also show vendors with debt even if no sales today
+  VV.forEach(v=>{if((v.debt||0)>0&&!byVendor[v.code])byVendor[v.code]={name:v.name,sales:[],tips:0,earn:0};});
+  $('pagos-list').innerHTML=Object.entries(byVendor).map(([code,d])=>{
+    const v=VV.find(x=>x.code===code);
+    const debt=v?.debt||0;
+    const neto=Math.max(0,d.earn-debt);
+    const deudaRestante=Math.max(0,debt-d.earn);
+    return`<div class="pago-card">
+      <div class="pago-header">
+        <div>
+          <div class="pago-name">${d.name}</div>
+          <div style="font-size:11px;color:var(--t2)">${d.sales.length} sesiones hoy</div>
+        </div>
+        ${debt>0?`<span class="deuda-badge">Deuda: ${fmt(debt)}</span>`:''}
+      </div>
+      <div class="pago-row"><span style="color:var(--t2)">Ganancia del día</span><span class="succ">${fmt(d.earn)}</span></div>
+      ${d.tips>0?`<div class="pago-row"><span style="color:var(--t2)">Propinas a devolver</span><span class="gold">${fmt(d.tips)}</span></div>`:''}
+      ${debt>0?`<div class="pago-row"><span style="color:var(--t2)">Deuda acumulada</span><span class="dng">-${fmt(Math.min(debt,d.earn))}</span></div>`:''}
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--bdr)">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-size:11px;color:var(--t2)">A pagar hoy</div>
+            <div class="pago-total">${fmt(neto)}</div>
+            ${d.tips>0?`<div style="font-size:11px;color:var(--shak)">+ ${fmt(d.tips)} propinas</div>`:''}
+            ${deudaRestante>0?`<div style="font-size:11px;color:var(--red)">Deuda pendiente: ${fmt(deudaRestante)}</div>`:''}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${debt>0?`<button class="bsm bg" onclick="descontarDeuda('${code}',${Math.min(debt,d.earn)})">Descontar deuda</button>`:''}
+            <button class="bsm" onclick="registrarAdelanto('${code}','${d.name}')">+ Adelanto</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.descontarDeuda=async function(code,monto){
+  const v=VV.find(x=>x.code===code);if(!v)return;
+  const newDebt=Math.max(0,(v.debt||0)-monto);
+  await sb.from('vendors').update({debt:newDebt}).eq('code',code);
+  v.debt=newDebt;toast(`✅ Deuda descontada: ${fmt(monto)}`,'var(--karol)');renderPagos();
+};
+
+window.darAdelanto=async function(code,name){
+  const monto=parseFloat(prompt('Adelanto para '+name+' - Cuanto? (Bs)')||'0');
+  if(!monto||monto<=0)return;
+  const motivo=prompt('Motivo (ej: falta de cambio, préstamo):')||'Adelanto';
+  const v=VV.find(x=>x.code===code);if(!v)return;
+  const newDebt=(v.debt||0)+monto;
+  await Promise.all([
+    sb.from('vendors').update({debt:newDebt}).eq('code',code),
+    sb.from('movements').insert({tipo:'ec',monto,descripcion:motivo+' — '+name,vendor_code:code,date:new Date().toISOString()})
+  ]);
+  v.debt=newDebt;CAJA-=monto;
+  addN(code,'💵','Adelanto registrado','Se te dio un adelanto de Bs '+monto.toFixed(2)+' — '+motivo);
+  toast('💵 Adelanto a '+name,'var(--shak)');
+  renderVG();renderPagos();renderCaja();updNC();
+};
+
+window.registrarAdelanto=async function(code,name){
+  const monto=parseFloat(prompt(`¿Cuánto de adelanto para ${name}? (Bs)`)||'0');
+  if(!monto||monto<=0)return;
+  const desc=prompt('Descripción del adelanto:')||'Adelanto de caja';
+  const v=VV.find(x=>x.code===code);if(!v)return;
+  const newDebt=(v.debt||0)+monto;
+  await Promise.all([
+    sb.from('vendors').update({debt:newDebt}).eq('code',code),
+    sb.from('movements').insert({tipo:'ec',monto,descripcion:desc,vendor_code:code,date:new Date().toISOString()})
+  ]);
+  v.debt=newDebt;CAJA-=monto;
+  toast(`⚠️ Adelanto registrado: ${fmt(monto)}`,'var(--shak)');renderPagos();renderCaja();
+};
+
+// ─── VENDOR GRID ───
+function renderVG(){
+  $('vgrid').innerHTML=VV.filter(v=>v.active!==false).map(v=>{
+    const lv=eL(v),l=LV[lv],pen=inP(v);
+    const hp=SH.some(s=>s.vcode===v.code&&s.status==='pending')||FA.some(f=>f.vcode===v.code&&f.status==='pending');
+    const vs=SS.filter(s=>s.vcode===v.code),tot=vs.reduce((a,s)=>a+s.amount,0);
+    return`<div class="vc" style="--vc:var(--${l.c})">
+      ${hp?'<div class="pd"></div>':''}
+      <div style="font-size:34px;margin-bottom:9px">${pen?'👶':l.i}</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:2px">${v.name}</div>
+      <div style="font-size:11px;color:var(--t2);letter-spacing:1px;margin-bottom:12px">${v.code}</div>
+      <div class="ir"><span class="ik">Nivel</span><span class="bdg ${getBadgeClass(l.c)}">${pen?'👶 Penalizada':l.n+' '+l.p+'%'}</span></div>
+      ${pen?`<div class="ir"><span class="ik">Penalización</span><span class="iv dng">${pLeft(v)} días</span></div>`:''}
+      ${(v.debt||0)>0?`<div class="ir"><span class="ik">Deuda</span><span class="iv dng">${fmt(v.debt)}</span></div>`:''}
+      <div class="ir"><span class="ik">Días trabajados</span><span class="iv">${v.days}</span></div>
+      <div class="ir"><span class="ik">Total ventas</span><span class="iv succ">${fmt(tot)}</span></div>
+      <div class="va">
+        ${v.level<2?`<button class="bsm bg" onclick="promote('${v.code}')">⬆ Subir</button>`:''}
+        ${v.level>0?`<button class="bsm br" onclick="demote('${v.code}')">⬇ Bajar</button>`:''}
+        <button class="bsm bp" onclick="applyPen('${v.code}')">⚠ Pen.</button>
+        <button class="bsm" style="border-color:var(--shak-g);color:var(--shak)" onclick="darAdelanto('${v.code}','${v.name}')">💵 Adelanto</button>
+        <button class="bsm br" onclick="deactivate('${v.code}')">🚫 Desact.</button>
+      </div>
+    </div>`;
+  }).join('')+
+  // Inactive vendors
+  (VV.filter(v=>v.active===false).length>0?`
+    <div style="grid-column:1/-1;margin-top:8px">
+      <div style="font-size:11px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Desactivadas</div>
+      ${VV.filter(v=>v.active===false).map(v=>`
+        <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;opacity:.6">
+          <div><strong>${v.name}</strong> <span style="color:var(--t2);font-size:12px">${v.code}</span></div>
+          <button class="bsm bg" onclick="reactivate('${v.code}')">✓ Reactivar</button>
+        </div>`).join('')}
+    </div>`:'');
+}
+
+window.promote=async function(code){
+  const v=VV.find(x=>x.code===code);if(!v||v.level>=2)return;
+  v.level++;v.prev_lvl=v.level;
+  await sb.from('vendors').update({level:v.level,prev_lvl:v.prev_lvl,seen_penalty:true}).eq('code',code);
+  showLU(v);addN(code,'⬆️','¡Subiste de nivel!',`Ahora eres ${LV[v.level].n} ${LV[v.level].i}`);
+  renderVG();updNC();toast(`⬆ ${v.name} → ${LV[v.level].n}`,'var(--shak)');
+};
+window.demote=async function(code){
+  const v=VV.find(x=>x.code===code);if(!v||v.level<=0)return;
+  v.level--;v.prev_lvl=v.level;
+  await sb.from('vendors').update({level:v.level,prev_lvl:v.prev_lvl}).eq('code',code);
+  renderVG();toast(`⬇ ${v.name} bajó de nivel`,'var(--red)');
+};
+window.applyPen=async function(code){
+  const v=VV.find(x=>x.code===code);if(!v)return;
+  const days=parseInt(prompt(`¿Cuántos días de penalización para ${v.name}?`)||'0');
+  if(!days||days<=0)return;
+  const motivo=prompt('Motivo (opcional):')||'';
+  v.prev_lvl=v.level;v.pen_total=days;v.pen_motivo=motivo;v.seen_penalty=false;
+  const end=new Date();end.setDate(end.getDate()+days);v.pen_end=end.toISOString();
+  await sb.from('vendors').update({prev_lvl:v.prev_lvl,pen_total:days,pen_motivo:motivo,seen_penalty:false,pen_end:v.pen_end}).eq('code',code);
+  renderVG();toast(`⚠ Penalización aplicada a ${v.name}`,'var(--red)');
+};
+window.deactivate=async function(code){
+  if(!confirm('¿Desactivar esta vendedora? Sus datos no se borrarán.'))return;
+  await sb.from('vendors').update({active:false}).eq('code',code);
+  const v=VV.find(x=>x.code===code);if(v)v.active=false;
+  renderVG();toast('🚫 Vendedora desactivada','var(--t2)');
+};
+window.reactivate=async function(code){
+  await sb.from('vendors').update({active:true}).eq('code',code);
+  const v=VV.find(x=>x.code===code);if(v)v.active=true;
+  renderVG();toast('✓ Vendedora reactivada','var(--karol)');
+};
+
+function showLU(v){
+  const l=LV[v.level];
+  $('lu-ic').textContent=l.i;$('lu-rk').textContent=l.n;$('lu-rk').style.color=`var(--${l.c})`;$('lu-tg').textContent=l.t;
+  const card=$('lu-card');
+  const cols=['#00e096','#ffd700','#ff4d8d','#7c6aff','#fff'];
+  for(let i=0;i<25;i++){const c=document.createElement('div');c.className='cf';
+    c.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*40}%;background:${cols[Math.floor(Math.random()*cols.length)]};border-radius:${Math.random()>.5?'50%':'2px'};animation-delay:${Math.random()*.5}s;`;
+    card.appendChild(c);setTimeout(()=>c.remove(),1500);}
+  oov('ov-lu');
+}
+
+function renderAV(){
+  const byDay={};
+  SS.filter(s=>!s.annulled).forEach(s=>{
+    const d=fd(s.date);if(!byDay[d])byDay[d]={t:0,m:0,n:0,ef:0,qr:0};
+    const c=calc(s);byDay[d].t+=s.amount;byDay[d].m+=c.m;byDay[d].n++;byDay[d][s.pay]++;
+  });
+  const days=Object.entries(byDay).slice(0,5);
+  $('dsum').innerHTML=`<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px">`+
+    days.map(([d,v])=>`<div style="background:var(--s2);border:1px solid var(--bdr);border-radius:12px;padding:12px 15px;min-width:130px">
+      <div style="font-size:10px;color:var(--t2);font-weight:700">${d}</div>
+      <div style="font-family:var(--dp);font-size:18px;color:var(--karol)">${fmt(v.t)}</div>
+      <div style="font-size:11px;color:var(--shak);font-weight:700">Mi ganancia: ${fmt(v.m)}</div>
+      <div style="font-size:11px;color:var(--t2)">${v.n} sesiones · 💵${v.ef||0} 📱${v.qr||0}</div>
+    </div>`).join('')+'</div>';
+  $('avb').innerHTML=SS.map(s=>{const c=calc(s),l=LV[s.level];
+    return`<tr>
+      <td>${fd(s.date)}</td><td>${ft(s.date)}</td><td>${s.vname}</td>
+      <td><span class="bdg ${getBadgeClass(l.c)}">${l.i} ${l.n}</span></td>
+      <td>${fmt(s.amount)}</td>
+      <td>${s.duration?s.duration+' min':'—'}</td>
+      <td>${s.pay==='ef'?'💵':'📱'}</td>
+      <td>${l.p}%</td>
+      <td class="succ">${s.annulled?'—':fmt(c.e)}</td>
+      <td class="gold">${s.annulled?'—':fmt(c.m)}</td>
+      <td>${s.annulled?'<span style="color:var(--red);font-size:11px;font-weight:700">ANULADA</span>':'<button class="bsm br" onclick="annulSale(\''+s.id+'\')" >Anular</button>'}</td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="10" style="text-align:center;color:var(--t2);padding:18px">Sin ventas</td></tr>';
+}
+
+function renderCal(){
+  const mn=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  $('calt').textContent=mn[CM]+' '+CY;
+  const hd=['LUN','MAR','MIÉ','JUE','VIE','SÁB','DOM'];
+  $('calh').innerHTML=hd.map(d=>`<div class="ch">${d}</div>`).join('');
+  const first=new Date(CY,CM,1),last=new Date(CY,CM+1,0);
+  let sd=first.getDay()-1;if(sd<0)sd=6;
+  let html='';for(let i=0;i<sd;i++)html+='<div></div>';
+  const appr=SH.filter(s=>s.status==='approved');
+  const cols=['var(--cazzu)','var(--karol)','var(--shak)','var(--adm)'];
+  for(let d=1;d<=last.getDate();d++){
+    const date=new Date(CY,CM,d);
+    const dn=hd[date.getDay()===0?6:date.getDay()-1];
+    const ds=appr.filter(s=>s.day.toUpperCase().startsWith(dn));
+    const isT=date.toDateString()===NOW.toDateString();
+    const dots=ds.slice(0,4).map((_,i)=>`<div class="dot2" style="background:${cols[i%4]}"></div>`).join('');
+    const sd2=JSON.stringify(ds.map(s=>({n:s.vname,i:s.time_in,o:s.time_out}))).replace(/"/g,'&quot;');
+    html+=`<div class="cd2 ${isT?'today':''} ${ds.length>0?'hev':''}" onclick="showCal(${d},${CM},${CY},'${dn}','${sd2}')">
+      <div class="cdn">${d}</div><div class="cdots">${dots}</div>
+    </div>`;
+  }
+  $('cald').innerHTML=html;
+}
+
+window.showCal=function(d,m,y,dn,sData){
+  const mn=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  $('cal-dt').textContent=`${d} de ${mn[m]}`;$('cal-sb').textContent=dn+' '+y;
+  let data=[];try{data=JSON.parse(sData.replace(/&quot;/g,'"'));}catch(e){}
+  const cols=['var(--cazzu)','var(--karol)','var(--shak)','var(--adm)'];
+  $('cal-ct').innerHTML=data.length===0?'<div style="color:var(--t2);text-align:center;padding:16px">Sin vendedoras programadas</div>':
+    data.map((s,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--s2);border-radius:12px;margin-bottom:8px;border:1px solid ${cols[i%4]}44">
+      <div style="width:10px;height:10px;border-radius:50%;background:${cols[i%4]};flex-shrink:0"></div>
+      <div><div style="font-weight:700;font-size:14px">${s.n}</div><div style="font-size:12px;color:var(--t2)">⏰ ${s.i} – ${s.o}</div></div>
+    </div>`).join('');
+  oov('ov-cal');
+};
+
+window.prevM=function(){CM--;if(CM<0){CM=11;CY--;}renderCal();};
+window.nextM=function(){CM++;if(CM>11){CM=0;CY++;}renderCal();};
+
+function renderASch(){
+  const pend=SH.filter(s=>s.status==='pending');
+  const pendF=FA.filter(f=>f.status==='pending');
+  let html='';
+  if(!pend.length&&!pendF.length)html='<div style="color:var(--t2);font-size:13px;padding:8px 0">Sin pendientes ✓</div>';
+  html+=pend.map(s=>`<div class="ir" style="flex-wrap:wrap;gap:8px">
+    <div>📅 <strong>${s.vname}</strong><span style="color:var(--t2);font-size:12px;margin-left:8px">${s.day} ${s.time_in}–${s.time_out}</span></div>
+    <div style="display:flex;gap:6px">
+      <button class="bsm bg" onclick="apprS('${s.id}','${s.vcode}')">✓</button>
+      <button class="bsm br" onclick="rejS('${s.id}','${s.vcode}')">✗</button>
+    </div>
+  </div>`).join('');
+  html+=pendF.map(f=>`<div class="ir" style="flex-wrap:wrap;gap:8px">
+    <div>⚠️ <strong>${f.vname}</strong><span style="color:var(--t2);font-size:12px;margin-left:8px">Falta ${fd(f.date)}: ${f.motivo}</span></div>
+    <div style="display:flex;gap:6px">
+      <button class="bsm bg" onclick="apprF('${f.id}','${f.vcode}')">✓</button>
+      <button class="bsm br" onclick="rejF('${f.id}','${f.vcode}')">✗</button>
+    </div>
+  </div>`).join('');
+  $('asch').innerHTML=html;
+}
+
+window.apprS=async function(id,vc){
+  await sb.from('schedules').update({status:'approved'}).eq('id',id);
+  const s=SH.find(x=>x.id===id);if(s)s.status='approved';
+  addN(vc,'📅','Horario aprobado','Tu turno fue aprobado ✓');
+  renderCal();renderASch();updNC();toast('✓ Horario aprobado','var(--karol)');
+};
+window.rejS=async function(id,vc){
+  await sb.from('schedules').update({status:'rejected'}).eq('id',id);
+  const s=SH.find(x=>x.id===id);if(s)s.status='rejected';
+  addN(vc,'📅','Horario rechazado','Tu propuesta fue rechazada');
+  renderASch();updNC();toast('✗ Rechazado','var(--red)');
+};
+window.apprF=async function(id,vc){
+  const f=FA.find(x=>x.id===id);if(!f)return;
+  await sb.from('absences').update({status:'approved'}).eq('id',id);
+  f.status='approved';addN(vc,'✅','Falta aprobada','Tu justificación fue aprobada');
+  renderASch();updNC();toast('✓ Falta aprobada','var(--karol)');
+};
+window.rejF=async function(id,vc){
+  const f=FA.find(x=>x.id===id);if(!f)return;
+  await sb.from('absences').update({status:'rejected'}).eq('id',id);
+  f.status='rejected';addN(vc,'❌','Falta rechazada','Tu justificación fue rechazada');
+  renderASch();updNC();toast('✗ Rechazada','var(--red)');
+};
+
+function renderCaja(){
+  $('cajas').textContent=fmt(CAJA);$('bancos').textContent=fmt(BANCO);
+  // Populate vendor select
+  const sel=$('mv');if(sel)sel.innerHTML='<option value="">Sin vendedora</option>'+VV.map(v=>`<option value="${v.code}">${v.name}</option>`).join('');
+  $('mh').innerHTML=MV.map(m=>`<tr>
+    <td>${fd(m.date)}</td>
+    <td><span class="bdg ${m.tipo.startsWith('i')?'bk':'ba'}">${m.tipo.startsWith('i')?'⬆':'⬇'} ${m.tipo.endsWith('c')?'💵 Caja':'🏦 Banco'}</span></td>
+    <td style="color:var(--t2)">${m.descripcion}</td>
+    <td style="color:var(--t2)">${m.vendor_code?VV.find(v=>v.code===m.vendor_code)?.name||m.vendor_code:'—'}</td>
+    <td class="${m.tipo.startsWith('i')?'succ':'dng'}">${m.tipo.startsWith('i')?'+':'-'}${fmt(m.monto)}</td>
+  </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--t2);padding:18px">Sin movimientos</td></tr>';
+}
+
+window.addMov=async function(){
+  const tipo=$('mt').value,monto=parseFloat($('mm').value)||0,desc=$('md').value.trim();
+  const vcode=$('mv')?.value||'';
+  if(!monto||!desc){toast('Completa todos los campos','var(--red)');return;}
+  const{data,error}=await sb.from('movements').insert({tipo,monto,descripcion:desc,vendor_code:vcode||null,date:new Date().toISOString()}).select().single();
+  if(error){toast('Error','var(--red)');return;}
+  MV.unshift(data);
+  if(tipo==='ic')CAJA+=monto;else if(tipo==='ec')CAJA-=monto;else if(tipo==='ib')BANCO+=monto;else BANCO-=monto;
+  // If assigned to vendor and it's an advance (egreso), add to debt
+  if(vcode&&tipo==='ec'){
+    const v=VV.find(x=>x.code===vcode);
+    if(v){v.debt=(v.debt||0)+monto;await sb.from('vendors').update({debt:v.debt}).eq('code',vcode);}
+  }
+  $('mm').value='';$('md').value='';
+  toast('✅ Registrado','var(--karol)');renderCaja();renderPagos();
+};
+
+// ─── PROBABILIDAD ───
+window.saveAndCalcProb=async function(){
+  // Save factors to Supabase
+  await sb.from('daily_factors').upsert({
+    date:todayStr(),
+    ...FAC,
+    calculated_score:calcProbScore(),
+    total_sales:SS.filter(s=>s.date&&s.date.startsWith(todayStr())).reduce((a,s)=>a+s.amount,0),
+    total_sessions:SS.filter(s=>s.date&&s.date.startsWith(todayStr())).length,
+  },{onConflict:'date'});
+  window.calcProb();
+  toast('✅ Factores guardados','var(--karol)');
+};
+
+function calcProbScore(){
+  let score=100;
+  if(FAC.bloqueo===1)score-=20;if(FAC.bloqueo===2)score-=40;
+  if(FAC.dolar===1)score-=8;if(FAC.dolar===2)score-=18;
+  if(FAC.gasolina===1)score-=10;if(FAC.gasolina===2)score-=22;
+  if(FAC.lluvia===1)score-=8;if(FAC.lluvia===2)score-=18;
+  if(FAC.feriado===1)score-=15;if(FAC.feriado===2)score+=12;
+  if(FAC.primerV===1)score-=25;
+  if(FAC.momento===1)score+=10;if(FAC.momento===2)score+=8;
+  if(FAC.vNueva===1)score+=15;
+  const dt=Array(7).fill(0);SS.forEach(s=>{dt[new Date(s.date).getDay()]+=s.amount;});
+  const mx=Math.max(...dt,1);score+=(dt[NOW.getDay()]/mx)*12;
+  return Math.max(5,Math.min(98,Math.round(score)));
+}
+
+window.calcProb=function(){
+  const score=calcProbScore();
+  const col=score>=70?'var(--karol)':score>=40?'var(--shak)':'var(--red)';
+  const em=score>=70?'🟢':score>=40?'🟡':'🔴';
+  const rec=score>=70?'Invertir en anuncio — condiciones favorables':score>=40?'Rendimiento normal esperado':'Evitar invertir en anuncios hoy';
+  $('pdisp').innerHTML=`<div style="border-radius:18px;padding:22px;border:1px solid ${col};background:${col}11">
+    <div style="font-family:var(--dp);font-size:64px;color:${col}">${score}%</div>
+    <div style="font-size:16px;font-weight:800;margin-top:4px">${em} ${score>=70?'Día prometedor':score>=40?'Día regular':'Día difícil'}</div>
+    <div style="font-size:13px;color:var(--t2);margin-top:8px;font-style:italic">${rec}</div>
+    <div style="font-size:11px;color:var(--t3);margin-top:8px">Basado en ${SS.length} sesiones históricas + factores del día</div>
+  </div>`;
+};
+
+function renderFactors(){
+  $('fg').innerHTML=FD.map(f=>`
+    <div class="fb ${FAC[f.k]>0?'on':''}" onclick="cycF('${f.k}')">
+      <div style="font-size:22px">${f.i}</div>
+      <div style="font-size:11px;font-weight:700;margin-top:4px">${f.l}</div>
+      <div style="font-size:10px;color:var(--t2)">${f.o[FAC[f.k]]}</div>
+    </div>`).join('');
+}
+window.cycF=function(k){const d=FD.find(f=>f.k===k);FAC[k]=(FAC[k]+1)%d.o.length;renderFactors();};
+
+function renderAviDest(){
+  const sel=$('avd');if(!sel)return;
+  sel.innerHTML='<option value="all">Todas</option>'+VV.map(v=>`<option value="${v.code}">${v.name}</option>`).join('');
+}
+window.sendAviso=function(){
+  const msg=$('avm').value.trim(),plat=$('avp').value;
+  if(!msg){toast('Escribe un mensaje','var(--red)');return;}
+  const dest=$('avd').value;
+  const targets=dest==='all'?VV.map(v=>v.code):[dest];
+  targets.forEach(code=>addN(code,'📢',`Aviso: ${plat}`,msg));
+  $('avm').value='';updNC();toast('📢 Aviso enviado','var(--karol)');
+};
+
+function renderStats(){
+  const dns=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const dt=Array(7).fill(0);SS.forEach(s=>{dt[new Date(s.date).getDay()]+=s.amount;});
+  const mx=Math.max(...dt,1);
+  $('chd').innerHTML=dns.map((d,i)=>{const h=Math.round(dt[i]/mx*100);const c=h>70?'var(--karol)':h>40?'var(--shak)':'var(--t2)';
+    return`<div class="cbw"><div class="cv" style="color:${c}">${dt[i]>0?Math.round(dt[i]):''}</div><div class="cb" style="height:${h}%;background:${c}"></div><div class="cbl">${d}</div></div>`;}).join('');
+  const perf=VV.filter(v=>v.active!==false).map(v=>{
+    const vs=SS.filter(s=>s.vcode===v.code);
+    return{v,vs,t:vs.reduce((a,s)=>a+s.amount,0),e:vs.reduce((a,s)=>a+calc(s).e,0)};
+  }).sort((a,b)=>b.t-a.t);
+  const md=['🥇','🥈','🥉'];
+  $('pt').innerHTML=perf.map(({v,vs,t,e},i)=>{const l=LV[v.level];
+    return`<tr><td>${md[i]||i+1}</td><td>${v.name}</td>
+    <td><span class="bdg ${getBadgeClass(l.c)}">${l.i} ${l.n}</span></td>
+    <td>${vs.length}</td><td>${fmt(t)}</td><td class="succ">${fmt(e)}</td></tr>`;
+  }).join('');
+}
+
+// ─── CHAT ADMIN ───
+window.smA=async function(){
+  if(!ACHAT)return;
+  const txt=$('ami').value.trim();if(!txt)return;
+  const key=`admin_${ACHAT}`;
+  await sb.from('messages').insert({chat_key:key,from_code:'admin',from_name:'Admin 👑',text:txt,time:new Date().toISOString()});
+  $('ami').value='';
+  addN(ACHAT,'💬','Mensaje del Admin',txt.slice(0,50));
+  await loadChat(key,$('acm'),'admin');updNC();
+};
+window.smAG=async function(){
+  const txt=$('amg').value.trim();if(!txt)return;
+  await sb.from('messages').insert({chat_key:'group',from_code:'admin',from_name:'Admin 👑',text:txt,time:new Date().toISOString()});
+  $('amg').value='';
+  VV.forEach(v=>addN(v.code,'👥','Mensaje grupal',txt.slice(0,50)));
+  await loadChat('group',$('acg'),'admin');updNC();
+};
+
+function renderAChat(){
+  $('acl').innerHTML=VV.filter(v=>v.active!==false).map(v=>`
+    <div class="ci ${ACHAT===v.code?'on':''}" onclick="openChat('${v.code}','${v.name}')">
+      <div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--s3);border:2px solid var(--bdr)">${LV[v.level].i}</div>
+      <div><div style="font-size:14px;font-weight:700">${v.name}</div><div style="font-size:12px;color:var(--t2)">Toca para chatear</div></div>
+    </div>`).join('');
+  loadChat('group',$('acg'),'admin');
+}
+window.openChat=async function(code,name){
+  ACHAT=code;
+  $('acw').style.display='block';
+  $('acwt').textContent=`💬 Chat con ${name}`;
+  await loadChat(`admin_${code}`,$('acm'),'admin');
+  renderAChat();
+};
+
+window.atb=function(t){
+  const tabs=['eq','ses','pag','vn','ca','cj','pr','st','ac','cf'];
+  tabs.forEach((x,i)=>{$(x).classList.toggle('on',x===t);document.querySelectorAll('#scr-a .tnb')[i].classList.toggle('on',x===t);});
+  if(t==='st')renderStats();
+  if(t==='ca'){renderCal();renderASch();}
+  if(t==='cj')renderCaja();
+  if(t==='pr'){renderFactors();window.calcProb();}
+  if(t==='ac')renderAChat();
+  if(t==='ses')renderSessions();
+  if(t==='pag')renderPagos();
+};
+
+window.saveCfg=async function(){
+  const np=$('apass').value,np2=$('apass2').value;
+  if(!np){toast('Ingresa una contraseña','var(--red)');return;}
+  if(np!==np2){toast('Las contraseñas no coinciden','var(--red)');return;}
+  ADMIN_PASS=np;
+  $('apass').value='';$('apass2').value='';
+  toast('✅ Contraseña actualizada','var(--karol)');
+};
+
+window.annulSale=async function(id){
+  if(!confirm('Anular esta venta? Quedara marcada como anulada y no contara en ganancias.'))return;
+  await sb.from('sales').update({annulled:true}).eq('id',id);
+  const s=SS.find(x=>x.id===id);if(s){s.annulled=true;if(s.vcode)addN(s.vcode,'❌','Venta anulada','Una de tus ventas fue anulada por el admin');}
+  toast('Venta anulada','var(--red)');renderAV();updateAStats();renderPagos();updNC();
+};
+
+window.marcarPresente=async function(code){
+  const v=VV.find(x=>x.code===code);if(!v)return;
+  v.days=(v.days||0)+1;
+  await sb.from('vendors').update({days:v.days}).eq('code',code);
+  addN(code,'✅','Asistencia confirmada','El admin confirmo tu asistencia de hoy. Buen trabajo!');
+  toast('Asistencia confirmada — '+v.name,'var(--karol)');
+  renderAsist();renderVG();updNC();
+};
+
+window.exportXL=function(){
+  if(typeof XLSX==='undefined'){toast('Cargando...','var(--shak)');return;}
+  const rows=[['Fecha','Hora','Vendedora','Nivel','Venta Bs','Duración','Método','%','Comisión','Mi Ganancia']];
+  SS.forEach(s=>{const c=calc(s),l=LV[s.level];
+    rows.push([fd(s.date),ft(s.date),s.vname,l.n,s.amount,s.duration?s.duration+' min':'—',s.pay==='ef'?'Efectivo':'QR',l.p+'%',c.e.toFixed(2),c.m.toFixed(2)]);
+  });
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'Ventas');
+  // Pagos summary
+  const today=todayStr();
+  const todaySS=SS.filter(s=>s.date&&s.date.startsWith(today));
+  const byV={};todaySS.forEach(s=>{if(!byV[s.vcode])byV[s.vcode]={name:s.vname,earn:0};byV[s.vcode].earn+=calc(s).e;});
+  const pRows=[['Vendedora','Ganancia Hoy','Deuda','A Pagar']];
+  Object.entries(byV).forEach(([code,d])=>{
+    const v=VV.find(x=>x.code===code);const debt=v?.debt||0;
+    pRows.push([d.name,d.earn.toFixed(2),debt.toFixed(2),Math.max(0,d.earn-debt).toFixed(2)]);
+  });
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(pRows),'Pagos del día');
+  XLSX.writeFile(wb,'salesflow.xlsx');toast('📊 Excel exportado','var(--karol)');
+};
+
+// Update sessions display every second for admin
+setInterval(()=>{if(ROLE==='admin'){const el=$('sessions-list');if(el&&document.querySelector('#ses.on'))renderSessions();}},1000);
+
+// ─── INIT ───
+setTimeout(async()=>{
+  const l=$('load');l.style.opacity='0';l.style.transition='opacity .5s';
+  setTimeout(()=>l.style.display='none',500);
+  await tryRestoreSession();
+},2000);
+</script>
+</body>
+</html>
