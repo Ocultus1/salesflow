@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SalesFlow — Ocultum 0.5</title>
+<title>SalesFlow — Ocultum 0.6</title>
 <meta name="theme-color" content="#07070f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 <style>
 :root{
   --bg:#07070f;--sur:#0f0f1c;--s2:#161628;--s3:#1e1e35;--bdr:#252540;
@@ -322,6 +323,23 @@ tbody td{padding:11px 13px;}
 /* PWA install prompt */
 .pwa-hint{position:fixed;bottom:16px;left:16px;right:16px;background:var(--sur);border:1px solid var(--shak);border-radius:14px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translateY(200%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
 .pwa-hint.on{transform:translateY(0);}
+
+/* ═══ QR GALLERY (v5.1) ═══ */
+.qr-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:10px;}
+.qr-item{background:var(--s3);border:1px solid var(--bdr);border-radius:12px;padding:10px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+.qr-item:hover{transform:translateY(-2px);border-color:var(--karol);}
+.qr-item.match{border-color:var(--karol);background:linear-gradient(135deg,#0a2a1a,#0a1a0a);box-shadow:0 0 20px rgba(0,224,150,.2);}
+.qr-item img{width:100%;aspect-ratio:1;object-fit:contain;background:#fff;border-radius:8px;padding:6px;}
+.qr-item-amount{font-family:var(--dp);font-size:22px;color:var(--karol);margin-top:6px;}
+.qr-item-name{font-size:11px;color:var(--t2);margin-top:2px;line-height:1.2;}
+.qr-item-del{position:absolute;top:6px;right:6px;background:var(--red);border:none;color:#fff;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.qr-upload-zone{border:2px dashed var(--bdr);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--s3);}
+.qr-upload-zone:hover{border-color:var(--karol);background:var(--s2);}
+.qr-upload-zone.drag{border-color:var(--karol);background:var(--s2);}
+.qr-preview{background:#fff;padding:10px;border-radius:10px;max-width:180px;margin:10px auto;}
+.qr-preview img{width:100%;display:block;}
+.qr-detected{background:linear-gradient(135deg,#0a2a1a,#0a1a0a);border:1px solid var(--karol);border-radius:10px;padding:10px;margin-top:10px;font-size:12px;}
+.qr-detected.warn{background:linear-gradient(135deg,#2a1a05,#1a1005);border-color:var(--shak);}
 </style>
 </head>
 <body>
@@ -381,22 +399,48 @@ tbody td{padding:11px 13px;}
   </div>
 </div>
 
-<!-- QR DE PAGO -->
+<!-- QR DE PAGO — Selector de galería -->
 <div class="ov" id="ov-qr">
-  <div class="ovc">
-    <div style="font-size:11px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;font-weight:700">QR de pago</div>
+  <div class="ovc" style="max-width:400px">
+    <div style="font-size:11px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;font-weight:700">Elige QR para el cliente</div>
     <div class="qr-amount" id="qr-amount">Bs 0</div>
-    <div class="qr-bank" id="qr-bank-name">—</div>
-    <div id="qr-canvas"></div>
-    <div class="qr-info">
-      <div><strong id="qr-holder">—</strong></div>
-      <div style="margin-top:4px">Cuenta: <strong id="qr-account">—</strong></div>
-      <div style="margin-top:8px;color:var(--t3);font-size:11px" id="qr-ref"></div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:6px" id="qr-match-hint">Buscando QR con este monto...</div>
+    <div id="qr-gallery-select" class="qr-gallery" style="max-height:340px;overflow-y:auto"></div>
+    <div id="qr-display-selected" style="display:none">
+      <div style="background:#fff;padding:14px;border-radius:12px;margin:12px 0">
+        <img id="qr-selected-img" style="width:100%;max-width:220px;display:block;margin:0 auto" />
+      </div>
+      <div style="font-size:12px;color:var(--t2);text-align:center">El cliente escanea este QR con su app bancaria</div>
     </div>
     <div style="display:flex;gap:8px;margin-top:16px">
       <button class="bsm bg" style="flex:1" onclick="markDeposit()">💰 Cliente pagó</button>
       <button class="bsm br" style="flex:1" onclick="cov('ov-qr')">Cerrar</button>
     </div>
+  </div>
+</div>
+
+<!-- SUBIR QR (Admin) -->
+<div class="ov" id="ov-qr-upload">
+  <div class="ovc" style="max-width:420px">
+    <div style="font-size:14px;font-weight:800;margin-bottom:10px">📤 Subir nuevo QR</div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Genera un QR desde tu app bancaria con el monto que quieras, guarda la imagen, y súbela acá.</div>
+
+    <div class="qr-upload-zone" id="qr-drop" onclick="document.getElementById('qr-file-input').click()">
+      <div style="font-size:32px">📷</div>
+      <div style="font-size:13px;margin-top:6px">Toca aquí o arrastra la imagen del QR</div>
+      <div style="font-size:11px;color:var(--t3);margin-top:4px">PNG, JPG (máx 2MB)</div>
+    </div>
+    <input type="file" id="qr-file-input" accept="image/*" style="display:none" onchange="handleQRUpload(event)">
+
+    <div id="qr-upload-preview" style="display:none">
+      <div class="qr-preview"><img id="qr-preview-img" /></div>
+      <div id="qr-upload-detected"></div>
+      <div class="f" style="margin-top:12px"><label>Monto (Bs)</label><input id="qr-upload-amount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="f"><label>Nombre del servicio (opcional)</label><input id="qr-upload-name" placeholder="ej: Uñas semipermanente"></div>
+      <button class="bsub" onclick="saveQR()">Guardar QR</button>
+    </div>
+
+    <button class="bsm br" style="width:100%;margin-top:10px" onclick="cov('ov-qr-upload');resetQRUpload()">Cerrar</button>
   </div>
 </div>
 
@@ -820,9 +864,17 @@ tbody td{padding:11px 13px;}
         <button class="bsub" onclick="saveCfg()">Cambiar contraseña</button>
       </div>
 
+      <!-- Mis QR de pago -->
+      <div class="cfg-block">
+        <div class="cfg-block-title">🖼 Mis QR de pago</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:12px">Sube QR desde tu app bancaria. Cuando la vendedora elija "QR" como pago, verá el que coincida con el monto.</div>
+        <button class="bsm bg" onclick="openQRUpload()">+ Subir nuevo QR</button>
+        <div id="admin-qr-gallery" class="qr-gallery" style="margin-top:14px"></div>
+      </div>
+
       <!-- Datos bancarios para QR -->
       <div class="cfg-block">
-        <div class="cfg-block-title">🏦 Datos bancarios (para QR)</div>
+        <div class="cfg-block-title">🏦 Datos bancarios (información de respaldo)</div>
         <div class="f"><label>Banco</label>
           <select id="cfg-bank">
             <option>Banco Mercantil Santa Cruz</option>
@@ -933,6 +985,8 @@ let PWA_PROMPT=null;
 let ALARM_AUDIO=null;
 let CURRENT_QR_SALE=null;
 let SCAN_STREAM=null;
+let QR_CODES=[];         // Lista de QRs del admin
+let PENDING_QR_UPLOAD=null; // {imageData, detectedAmount}
 
 // ─── DATE UTILS (todo Bolivia timezone) ───
 const $=id=>document.getElementById(id);
@@ -1530,34 +1584,183 @@ window.regTipOnly=async function(){
   updateVStats();renderVHist();
 };
 
-// ─── QR DE PAGO ───
-function showPaymentQR(amount,saleId){
+// ═══ QR DE PAGO (v5.1 — sistema de galería) ═══
+async function loadQRCodes(){
+  const{data}=await sb.from('qr_codes').select('*').eq('active',true).order('amount',{ascending:true});
+  QR_CODES=data||[];
+}
+
+// Vendedora: mostrar galería filtrada por monto
+async function showPaymentQR(amount,saleId){
   CURRENT_QR_SALE=saleId;
-  const holder=CFG.bank_holder||'—';
-  const account=CFG.bank_account||'—';
-  const bank=CFG.bank_name||'—';
-  if(!account||account==='—'){
-    toast('⚠️ Falta configurar datos bancarios (Admin → Config)','var(--shak)');
-  }
+  await loadQRCodes();
   $('qr-amount').textContent=fmt(amount);
-  $('qr-bank-name').textContent=bank;
-  $('qr-holder').textContent=holder;
-  $('qr-account').textContent=account;
-  $('qr-ref').textContent=`Ref: SF-${(saleId||'').slice(0,8)} · ${new Date().toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit',timeZone:'America/La_Paz'})}`;
-  const qrText=`PAGO SALESFLOW\nMonto: Bs ${amount.toFixed(2)}\nBanco: ${bank}\nCuenta: ${account}\nTitular: ${holder}\nRef: ${(saleId||'').slice(0,8)}`;
-  const el=$('qr-canvas');el.innerHTML='';
-  try{
-    new QRCode(el,{text:qrText,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-  }catch(e){el.innerHTML='<div style="color:#000;padding:40px">QR no disponible</div>';}
+  $('qr-display-selected').style.display='none';
+  const gal=$('qr-gallery-select');
+  if(QR_CODES.length===0){
+    $('qr-match-hint').innerHTML='<span style="color:var(--red)">⚠️ El admin no ha subido QR todavía. Pídele que los suba en Config.</span>';
+    gal.innerHTML='';
+    oov('ov-qr');return;
+  }
+  // Filtrar por monto exacto primero, luego mostrar todos
+  const exactMatch=QR_CODES.filter(q=>Math.abs(q.amount-amount)<0.01);
+  const others=QR_CODES.filter(q=>Math.abs(q.amount-amount)>=0.01);
+  const sorted=[...exactMatch,...others];
+  $('qr-match-hint').innerHTML=exactMatch.length>0
+    ?`<span style="color:var(--karol)">✓ QR encontrado para ${fmt(amount)}</span> — Toca para mostrar al cliente`
+    :`⚠️ Sin QR exacto para ${fmt(amount)} — Toca uno para usar`;
+  gal.innerHTML=sorted.map(q=>{
+    const match=Math.abs(q.amount-amount)<0.01;
+    return`<div class="qr-item ${match?'match':''}" onclick="selectQR('${q.id}')">
+      <img src="${esc(q.image_data)}" alt="QR">
+      <div class="qr-item-amount">${fmt(q.amount)}</div>
+      ${q.name?`<div class="qr-item-name">${esc(q.name)}</div>`:''}
+    </div>`;
+  }).join('');
   oov('ov-qr');
 }
+
+window.selectQR=async function(id){
+  const q=QR_CODES.find(x=>x.id===id);if(!q)return;
+  $('qr-gallery-select').style.display='none';
+  $('qr-match-hint').style.display='none';
+  $('qr-display-selected').style.display='block';
+  $('qr-selected-img').src=q.image_data;
+  // Incrementar usage_count
+  await sb.from('qr_codes').update({usage_count:(q.usage_count||0)+1}).eq('id',id);
+};
 
 window.markDeposit=async function(){
   if(!CURRENT_QR_SALE){toast('No hay venta activa','var(--red)');cov('ov-qr');return;}
   await sb.from('sales').update({deposit_confirmed:true}).eq('id',CURRENT_QR_SALE);
   addN('admin','💰','Cliente pagó por QR',`${ME.name} marcó que el cliente pagó — verifica en tu app bancaria`);
   toast('✓ Depósito reportado al admin','var(--karol)');
-  cov('ov-qr');CURRENT_QR_SALE=null;
+  cov('ov-qr');
+  $('qr-gallery-select').style.display='';
+  $('qr-match-hint').style.display='';
+  CURRENT_QR_SALE=null;
+};
+
+// ─── Admin: subir QR + auto-detección ───
+window.openQRUpload=function(){
+  resetQRUpload();
+  oov('ov-qr-upload');
+};
+
+window.resetQRUpload=function(){
+  PENDING_QR_UPLOAD=null;
+  $('qr-upload-preview').style.display='none';
+  $('qr-file-input').value='';
+  $('qr-upload-amount').value='';
+  $('qr-upload-name').value='';
+  $('qr-upload-detected').innerHTML='';
+};
+
+window.handleQRUpload=async function(evt){
+  const file=evt.target.files[0];if(!file)return;
+  if(file.size>2*1024*1024){toast('Imagen muy grande (máx 2MB)','var(--red)');return;}
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    const dataUrl=e.target.result;
+    $('qr-preview-img').src=dataUrl;
+    $('qr-upload-preview').style.display='block';
+    // Intentar leer el QR y detectar monto
+    const detected=await detectQRAmount(dataUrl);
+    PENDING_QR_UPLOAD={imageData:dataUrl,detectedAmount:detected.amount,rawContent:detected.raw};
+    if(detected.amount!=null){
+      $('qr-upload-amount').value=detected.amount.toFixed(2);
+      $('qr-upload-detected').innerHTML=`<div class="qr-detected">✓ Monto detectado: <strong>${fmt(detected.amount)}</strong><div style="font-size:11px;color:var(--t2);margin-top:4px">Puedes cambiarlo si es necesario</div></div>`;
+    } else if(detected.raw){
+      $('qr-upload-detected').innerHTML=`<div class="qr-detected warn">⚠️ QR leído pero sin monto en el código<div style="font-size:11px;color:var(--t2);margin-top:4px">Ingresa el monto manualmente</div></div>`;
+    } else {
+      $('qr-upload-detected').innerHTML=`<div class="qr-detected warn">⚠️ No pude leer el QR de la imagen<div style="font-size:11px;color:var(--t2);margin-top:4px">Ingresa el monto manualmente. Igual se guardará bien.</div></div>`;
+    }
+  };
+  reader.readAsDataURL(file);
+};
+
+// Decodificar QR con jsQR + parsear formato EMV para extraer monto
+async function detectQRAmount(dataUrl){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        const canvas=document.createElement('canvas');
+        canvas.width=img.width;canvas.height=img.height;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0);
+        const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+        const code=jsQR(imgData.data,canvas.width,canvas.height);
+        if(!code){res({amount:null,raw:null});return;}
+        const raw=code.data;
+        // Parsear formato EMV TLV — Tag 54 = Transaction Amount
+        const amount=parseEMVAmount(raw);
+        res({amount,raw});
+      }catch(e){console.warn('QR read error:',e);res({amount:null,raw:null});}
+    };
+    img.onerror=()=>res({amount:null,raw:null});
+    img.src=dataUrl;
+  });
+}
+
+// EMV QR Code format parser (Bolivia's QR Simple usa este estándar)
+function parseEMVAmount(qrData){
+  try{
+    let i=0;
+    while(i<qrData.length-4){
+      const tag=qrData.substring(i,i+2);
+      const len=parseInt(qrData.substring(i+2,i+4),10);
+      if(isNaN(len))break;
+      const value=qrData.substring(i+4,i+4+len);
+      if(tag==='54'){  // Transaction Amount
+        const amount=parseFloat(value);
+        if(!isNaN(amount)&&amount>0)return amount;
+      }
+      i+=4+len;
+    }
+  }catch(e){}
+  // Fallback: buscar número tras "Bs" o "Monto:"
+  const m=qrData.match(/(?:monto|amount|bs\.?)\s*:?\s*(\d+(?:\.\d+)?)/i);
+  if(m)return parseFloat(m[1]);
+  return null;
+}
+
+window.saveQR=async function(){
+  if(!PENDING_QR_UPLOAD){toast('Sube una imagen primero','var(--red)');return;}
+  const amount=parseFloat($('qr-upload-amount').value);
+  if(!amount||amount<=0){toast('Ingresa un monto válido','var(--red)');return;}
+  const name=$('qr-upload-name').value.trim();
+  const{data,error}=await sb.from('qr_codes').insert({
+    name:name||null,amount,image_data:PENDING_QR_UPLOAD.imageData,
+    detected_amount:PENDING_QR_UPLOAD.detectedAmount,active:true
+  }).select().single();
+  if(error){toast('Error: '+error.message,'var(--red)');return;}
+  QR_CODES.push(data);
+  toast('✓ QR guardado','var(--karol)');
+  cov('ov-qr-upload');resetQRUpload();renderAdminQRGallery();
+};
+
+async function renderAdminQRGallery(){
+  const el=$('admin-qr-gallery');if(!el)return;
+  await loadQRCodes();
+  if(QR_CODES.length===0){
+    el.innerHTML='<div style="color:var(--t3);font-size:11px;padding:8px 0">Sin QR guardados todavía</div>';
+    return;
+  }
+  el.innerHTML=QR_CODES.map(q=>`<div class="qr-item">
+    <button class="qr-item-del" onclick="deleteQR('${q.id}')">✕</button>
+    <img src="${esc(q.image_data)}" alt="QR">
+    <div class="qr-item-amount">${fmt(q.amount)}</div>
+    ${q.name?`<div class="qr-item-name">${esc(q.name)}</div>`:''}
+    ${q.usage_count?`<div style="font-size:10px;color:var(--t3);margin-top:2px">${q.usage_count} usos</div>`:''}
+  </div>`).join('');
+}
+
+window.deleteQR=async function(id){
+  if(!confirm('¿Borrar este QR?'))return;
+  await sb.from('qr_codes').update({active:false}).eq('id',id);
+  QR_CODES=QR_CODES.filter(q=>q.id!==id);
+  toast('QR eliminado','var(--t2)');renderAdminQRGallery();
 };
 
 // ─── SCHEDULES ───
@@ -1654,6 +1857,7 @@ function renderA(){
   $('cfg-holder').value=CFG.bank_holder||'';
   updateHomeIPDisplay();
   checkNotifStatus();
+  renderAdminQRGallery();
 }
 
 function updateHomeIPDisplay(){
@@ -1665,10 +1869,17 @@ function updateHomeIPDisplay(){
 
 function updateAStats(){
   const t=todayStr();
-  const td=SS.filter(s=>!s.annulled&&saleDate(s)===t);
-  const tdE=td.reduce((a,s)=>a+calc(s).m,0);
-  let ts=0,tc=0;
-  SS.filter(s=>!s.annulled).forEach(s=>{const c=calc(s);ts+=s.amount;tc+=c.e;});
+  // Ventas totales del negocio: SÍ cuentan anuladas (para stats históricas)
+  // Ganancias/comisiones: NO cuentan anuladas
+  let ts=0,tc=0,tdE=0;
+  SS.forEach(s=>{
+    ts+=s.amount;  // Todas las ventas suman al total del negocio
+    if(!s.annulled){
+      const c=calc(s);
+      tc+=c.e;  // Comisiones solo de no-anuladas
+      if(saleDate(s)===t)tdE+=c.m;  // Mi ganancia hoy solo de no-anuladas
+    }
+  });
   $('as1').textContent=fmt(ts);$('as2').textContent=fmt(tdE);
   $('as3').textContent=fmt(tc);$('as4').textContent=VV.filter(v=>v.active!==false).length;
 }
@@ -1961,9 +2172,12 @@ function showLU(v){
 function renderAV(){
   const t=todayStr();
   const byDay={};
-  SS.filter(s=>!s.annulled).forEach(s=>{
-    const d=fd(s.date);if(!byDay[d])byDay[d]={t:0,m:0,n:0,ef:0,qr:0};
-    const c=calc(s);byDay[d].t+=s.amount;byDay[d].m+=c.m;byDay[d].n++;byDay[d][s.pay]=(byDay[d][s.pay]||0)+1;
+  // FIX v5.1: totales del negocio SÍ incluyen anuladas, ganancias no
+  SS.forEach(s=>{
+    const d=fd(s.date);if(!byDay[d])byDay[d]={t:0,m:0,n:0,ef:0,qr:0,an:0};
+    byDay[d].t+=s.amount; byDay[d][s.pay]=(byDay[d][s.pay]||0)+1;
+    if(s.annulled){byDay[d].an++;}
+    else{const c=calc(s);byDay[d].m+=c.m;byDay[d].n++;}
   });
   const days=Object.entries(byDay).slice(0,5);
   $('dsum').innerHTML=`<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px">`+
@@ -1971,7 +2185,7 @@ function renderAV(){
       <div style="font-size:10px;color:var(--t2);font-weight:700">${d}</div>
       <div style="font-family:var(--dp);font-size:18px;color:var(--karol)">${fmt(v.t)}</div>
       <div style="font-size:11px;color:var(--shak);font-weight:700">Mi ganancia: ${fmt(v.m)}</div>
-      <div style="font-size:11px;color:var(--t2)">${v.n} sesiones · 💵${v.ef||0} 📱${v.qr||0}</div>
+      <div style="font-size:11px;color:var(--t2)">${v.n} sesiones · 💵${v.ef||0} 📱${v.qr||0}${v.an?` · <span style="color:var(--red)">${v.an} anul.</span>`:''}</div>
     </div>`).join('')+'</div>';
   $('avb').innerHTML=SS.map(s=>{const c=calc(s),l=LV[s.level];
     return`<tr>
@@ -2184,7 +2398,8 @@ window.sendAviso=function(){
 
 function renderStats(){
   const dns=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  const dt=Array(7).fill(0);SS.filter(s=>!s.annulled).forEach(s=>{dt[new Date(s.date).getDay()]+=s.amount;});
+  // FIX v5.1: incluir anuladas en el gráfico de ventas totales
+  const dt=Array(7).fill(0);SS.forEach(s=>{dt[new Date(s.date).getDay()]+=s.amount;});
   const mx=Math.max(...dt,1);
   $('chd').innerHTML=dns.map((d,i)=>{const h=Math.round(dt[i]/mx*100);const c=h>70?'var(--karol)':h>40?'var(--shak)':'var(--t2)';
     return`<div class="cbw"><div class="cv" style="color:${c}">${dt[i]>0?Math.round(dt[i]):''}</div><div class="cb" style="height:${h}%;background:${c}"></div><div class="cbl">${d}</div></div>`;}).join('');
@@ -2244,8 +2459,19 @@ window.atb=function(t){
   if(t==='ac')renderAChat();
   if(t==='ses')renderSessions();
   if(t==='pag')renderPagos();
-  if(t==='cf')renderBlockedList();
+  if(t==='cf'){renderBlockedList();renderAdminQRGallery();}
 };
+
+// Drag & drop para subir QR
+setTimeout(()=>{
+  const dz=$('qr-drop');if(!dz)return;
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+  dz.addEventListener('drop',e=>{
+    const f=e.dataTransfer.files[0];
+    if(f){$('qr-file-input').files=e.dataTransfer.files;handleQRUpload({target:{files:[f]}});}
+  });
+},500);
 
 window.saveCfg=async function(){
   const np=$('apass').value,np2=$('apass2').value;
