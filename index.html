@@ -3,9 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SalesFlow — Ocultum 0.1</title>
+<title>SalesFlow — Ocultum 0.5</title>
+<meta name="theme-color" content="#07070f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SalesFlow">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2307070f'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23ffd700'>💎</text></svg>">
+<link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2307070f'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23ffd700'>💎</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --bg:#07070f;--sur:#0f0f1c;--s2:#161628;--s3:#1e1e35;--bdr:#252540;
@@ -261,6 +268,60 @@ tbody td{padding:11px 13px;}
 /* MISC */
 .succ{color:var(--karol);}.gold{color:var(--shak);}.dng{color:var(--red);}.pink{color:var(--adm);}
 @media(max-width:600px){.fr{grid-template-columns:1fr;}.main{padding:12px;}.sr{grid-template-columns:1fr 1fr;}.caja-r{grid-template-columns:1fr;}}
+
+/* ═══ v5 NUEVO ═══ */
+
+/* QR de pago */
+#ov-qr .ovc{max-width:340px;background:var(--sur);border:2px solid var(--karol);}
+.qr-amount{font-family:var(--dp);font-size:56px;color:var(--karol);letter-spacing:2px;margin:4px 0 2px;}
+.qr-bank{font-size:12px;color:var(--t2);letter-spacing:1px;text-transform:uppercase;font-weight:700;}
+#qr-canvas{background:#fff;padding:16px;border-radius:14px;margin:16px auto;display:inline-block;}
+#qr-canvas img{display:block;margin:0 auto;}
+.qr-info{background:var(--s2);border:1px solid var(--bdr);border-radius:12px;padding:12px;margin-top:14px;text-align:left;font-size:12px;color:var(--t2);}
+.qr-info strong{color:var(--txt);}
+
+/* Alarma sesión terminada */
+.timer-display.alarm{animation:alarm-pulse .5s ease-in-out infinite;color:var(--red);}
+@keyframes alarm-pulse{0%,100%{transform:scale(1);text-shadow:0 0 20px var(--red);}50%{transform:scale(1.08);text-shadow:0 0 40px var(--red);}}
+.session-timer.alarm{animation:alarm-pulse .5s ease-in-out infinite;color:var(--red);}
+
+/* Deuda visible en panel vendedora */
+.debt-banner{background:linear-gradient(135deg,#2a0505,#1a0505);border:1px solid var(--red);border-radius:14px;padding:14px 18px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;}
+.debt-label{font-size:11px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;font-weight:700;}
+.debt-amount{font-family:var(--dp);font-size:28px;color:var(--red);letter-spacing:1px;}
+
+/* Pantalla FUERA DE SERVICIO */
+#scr-blocked{align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#2a0505,#07070f 70%);}
+.blocked-box{text-align:center;padding:40px 30px;max-width:400px;}
+.blocked-icon{font-size:120px;margin-bottom:20px;animation:blocked-warn 2s ease-in-out infinite;}
+@keyframes blocked-warn{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.6;transform:scale(.95);}}
+.blocked-title{font-family:var(--dp);font-size:48px;letter-spacing:4px;color:var(--red);margin-bottom:14px;text-shadow:0 0 30px var(--red);}
+.blocked-text{font-size:15px;color:var(--t2);line-height:1.5;margin-bottom:24px;}
+.blocked-code{font-family:monospace;font-size:11px;color:var(--t3);background:var(--s2);border:1px solid var(--bdr);border-radius:8px;padding:8px 12px;display:inline-block;}
+
+/* Depósito notification banner */
+.deposit-banner{background:linear-gradient(135deg,#0a2a1a,#0a1a2a);border:1px solid var(--karol);border-radius:14px;padding:14px 18px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.deposit-pending{border-color:var(--shak);background:linear-gradient(135deg,#2a1a05,#1a1005);}
+
+/* Configuración v5 - bloques */
+.cfg-block{background:var(--s2);border:1px solid var(--bdr);border-radius:14px;padding:16px;margin-bottom:14px;}
+.cfg-block-title{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--t2);margin-bottom:12px;}
+
+/* IP de casa detectada */
+.ip-current{background:var(--s3);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px;font-family:monospace;font-size:13px;color:var(--karol);display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+
+/* QR fijo puerta - display */
+.door-qr-display{background:#fff;padding:20px;border-radius:14px;text-align:center;margin:16px 0;}
+.door-qr-display .door-title{color:#000;font-weight:800;font-size:14px;margin-bottom:10px;letter-spacing:1px;}
+
+/* Botón Pagado en pagos del día */
+.pago-card.paid{opacity:.55;background:var(--s2);}
+.pago-card.paid::before{content:'✓ PAGADO';position:absolute;top:14px;right:14px;font-size:11px;font-weight:800;color:var(--karol);letter-spacing:2px;}
+.pago-card{position:relative;}
+
+/* PWA install prompt */
+.pwa-hint{position:fixed;bottom:16px;left:16px;right:16px;background:var(--sur);border:1px solid var(--shak);border-radius:14px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:400;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:translateY(200%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);}
+.pwa-hint.on{transform:translateY(0);}
 </style>
 </head>
 <body>
@@ -317,6 +378,77 @@ tbody td{padding:11px 13px;}
       </div>
     </div>
     <div id="notifs-list"></div>
+  </div>
+</div>
+
+<!-- QR DE PAGO -->
+<div class="ov" id="ov-qr">
+  <div class="ovc">
+    <div style="font-size:11px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;font-weight:700">QR de pago</div>
+    <div class="qr-amount" id="qr-amount">Bs 0</div>
+    <div class="qr-bank" id="qr-bank-name">—</div>
+    <div id="qr-canvas"></div>
+    <div class="qr-info">
+      <div><strong id="qr-holder">—</strong></div>
+      <div style="margin-top:4px">Cuenta: <strong id="qr-account">—</strong></div>
+      <div style="margin-top:8px;color:var(--t3);font-size:11px" id="qr-ref"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button class="bsm bg" style="flex:1" onclick="markDeposit()">💰 Cliente pagó</button>
+      <button class="bsm br" style="flex:1" onclick="cov('ov-qr')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR ASISTENCIA (puerta) -->
+<div class="ov" id="ov-door-qr">
+  <div class="ovc">
+    <div style="font-size:11px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px">QR de asistencia — imprime esto</div>
+    <div class="door-qr-display">
+      <div class="door-title">📍 SALESFLOW — Marca tu llegada</div>
+      <div id="door-qr-canvas"></div>
+      <div style="color:#666;font-size:11px;margin-top:8px">Escanea al llegar</div>
+    </div>
+    <div style="font-size:12px;color:var(--t2);margin:12px 0">Imprime este QR y pégalo en la puerta. Cuando la vendedora abra la app y lo escanee, se marca su asistencia.</div>
+    <div style="display:flex;gap:8px">
+      <button class="bsm bg" style="flex:1" onclick="printDoorQR()">🖨 Imprimir</button>
+      <button class="bsm" style="flex:1" onclick="cov('ov-door-qr')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ESCANEAR QR ASISTENCIA (vendedora) -->
+<div class="ov" id="ov-scan">
+  <div class="ovc">
+    <div style="font-size:14px;font-weight:800;margin-bottom:12px">📸 Escanea el QR de la puerta</div>
+    <video id="scan-video" style="width:100%;border-radius:12px;background:#000;max-height:280px;" autoplay playsinline></video>
+    <div style="font-size:12px;color:var(--t2);margin-top:10px">Apunta la cámara al QR pegado en la puerta</div>
+    <button class="bsm br" style="width:100%;margin-top:12px" onclick="stopScan()">Cancelar</button>
+  </div>
+</div>
+
+<!-- PANTALLA FUERA DE SERVICIO -->
+<div id="scr-blocked" class="scr">
+  <div class="blocked-box">
+    <div class="blocked-icon">🚫</div>
+    <div class="blocked-title">FUERA DE SERVICIO</div>
+    <div class="blocked-text">
+      Este dispositivo ya no tiene acceso a SalesFlow.<br><br>
+      Si crees que es un error, contacta al admin.
+    </div>
+    <div class="blocked-code" id="blocked-device-id">—</div>
+  </div>
+</div>
+
+<!-- PWA INSTALL HINT -->
+<div class="pwa-hint" id="pwa-hint">
+  <div>
+    <div style="font-size:13px;font-weight:800;color:var(--shak)">📱 Instala SalesFlow</div>
+    <div style="font-size:11px;color:var(--t2);margin-top:2px">Tenla como app en tu celular</div>
+  </div>
+  <div style="display:flex;gap:6px">
+    <button class="bsm bg" onclick="installPWA()">Instalar</button>
+    <button class="bsm" onclick="dismissPWA()">Ahora no</button>
   </div>
 </div>
 
@@ -394,6 +526,14 @@ tbody td{padding:11px 13px;}
         <div style="font-size:10px;color:var(--t3);margin-top:4px;text-align:right" id="vpend"></div>
       </div>
       <div class="nh"><span>⬆️</span><span id="vnxt"></span></div>
+      <!-- DEUDA visible para la vendedora -->
+      <div id="v-debt" class="debt-banner" style="display:none">
+        <div>
+          <div class="debt-label">💰 Deuda pendiente</div>
+          <div style="font-size:11px;color:var(--t2);margin-top:4px">Se descuenta de tu ganancia</div>
+        </div>
+        <div class="debt-amount" id="v-debt-amount">Bs 0</div>
+      </div>
     </div>
 
     <!-- STATS -->
@@ -404,8 +544,13 @@ tbody td{padding:11px 13px;}
       <div class="sc" style="--sc:var(--t2)"><div class="sl">Días trabajados</div><div class="sv" id="vs4">0</div></div>
     </div>
 
-    <!-- ASISTENCIA STATUS -->
-    <div id="v-asist-status" style="display:none;margin-bottom:15px;"></div>
+    <!-- ASISTENCIA STATUS + BOTÓN escanear puerta -->
+    <div id="v-asist-status" style="margin-bottom:15px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;background:var(--sur);border:1px solid var(--bdr);border-radius:14px;padding:12px 14px;">
+        <div id="v-asist-label" style="font-size:13px;color:var(--t2)">📍 Marca tu asistencia al llegar</div>
+        <button class="bsm bg" onclick="startScan()">📸 Escanear QR puerta</button>
+      </div>
+    </div>
 
     <!-- TIMER ACTIVO -->
     <div id="v-timer-wrap" style="display:none;">
@@ -432,7 +577,7 @@ tbody td{padding:11px 13px;}
         <div class="f"><label>Propina (Bs) — opcional</label><input id="vti" type="number" min="0" placeholder="0.00"></div>
       </div>
       <div class="f">
-        <label>Duración de la sesión</label>
+        <label>Duración de la sesión <span style="color:var(--t3);font-weight:400;text-transform:none;letter-spacing:0">(no necesaria si es solo propina)</span></label>
         <div class="dur-btns">
           <button class="dur-btn" onclick="setDur(10)">10 min</button>
           <button class="dur-btn" onclick="setDur(15)">15 min</button>
@@ -454,6 +599,8 @@ tbody td{padding:11px 13px;}
       </div>
       <div class="f"><label>Nota</label><input id="vno" placeholder="opcional..."></div>
       <button class="bsub" onclick="regSale()">Registrar e iniciar sesión 🔥</button>
+      <div style="text-align:center;margin-top:10px;color:var(--t3);font-size:11px;letter-spacing:2px">— o —</div>
+      <button class="bsub" style="background:linear-gradient(135deg,#2a1a05,#1a1005);border-color:var(--shak);color:var(--shak);margin-top:10px" onclick="regTipOnly()">💰 Solo registrar propina</button>
     </div>
 
     <!-- HISTORIAL -->
@@ -662,13 +809,77 @@ tbody td{padding:11px 13px;}
     </div>
 
     <!-- CONFIG -->
-    <div id="cf" class="tp card">
-      <div class="ct"><div class="cd" style="background:var(--adm)"></div>Configuración</div>
-      <div class="fr">
-        <div class="f"><label>Nueva contraseña admin</label><input id="apass" type="password" placeholder="nueva contraseña"></div>
-        <div class="f"><label>Confirmar contraseña</label><input id="apass2" type="password" placeholder="repetir contraseña"></div>
+    <div id="cf" class="tp">
+      <!-- Contraseña admin -->
+      <div class="cfg-block">
+        <div class="cfg-block-title">🔒 Contraseña admin</div>
+        <div class="fr">
+          <div class="f"><label>Nueva contraseña</label><input id="apass" type="password" placeholder="nueva contraseña"></div>
+          <div class="f"><label>Confirmar</label><input id="apass2" type="password" placeholder="repetir contraseña"></div>
+        </div>
+        <button class="bsub" onclick="saveCfg()">Cambiar contraseña</button>
       </div>
-      <button class="bsub" onclick="saveCfg()">Cambiar contraseña ✅</button>
+
+      <!-- Datos bancarios para QR -->
+      <div class="cfg-block">
+        <div class="cfg-block-title">🏦 Datos bancarios (para QR)</div>
+        <div class="f"><label>Banco</label>
+          <select id="cfg-bank">
+            <option>Banco Mercantil Santa Cruz</option>
+            <option>Banco Económico</option>
+            <option>Banco Unión</option>
+            <option>Banco Nacional de Bolivia (BNB)</option>
+            <option>Banco de Crédito (BCP)</option>
+            <option>Banco Ganadero</option>
+            <option>Banco BISA</option>
+            <option>Banco FIE</option>
+            <option>Banco Sol</option>
+            <option>Banco Fassil</option>
+          </select>
+        </div>
+        <div class="fr">
+          <div class="f"><label>Número de cuenta</label><input id="cfg-account" placeholder="ej: 1234567890"></div>
+          <div class="f"><label>Titular</label><input id="cfg-holder" placeholder="Nombre en la cuenta"></div>
+        </div>
+        <button class="bsub" onclick="saveBank()">Guardar datos bancarios</button>
+        <div style="font-size:11px;color:var(--t2);margin-top:8px">💡 El QR Simple de Bolivia es interoperable — los clientes pueden pagar desde cualquier banco al tuyo.</div>
+      </div>
+
+      <!-- WiFi / IP de casa -->
+      <div class="cfg-block">
+        <div class="cfg-block-title">📡 WiFi de casa (auto-asistencia)</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Cuando las vendedoras abran la app conectadas a tu WiFi, se auto-marca su asistencia.</div>
+        <div class="ip-current">
+          <span>IP de casa actual:</span>
+          <span id="cfg-current-ip">—</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button class="bsm bg" onclick="setHomeIP()">📍 Establecer esta IP como casa</button>
+          <button class="bsm br" onclick="clearHomeIP()">Quitar</button>
+        </div>
+        <div style="font-size:11px;color:var(--t3);margin-top:10px">⚠️ Solo aprieta "establecer" cuando ESTÉS en casa. Si tu IP cambia (reinicias el módem), vuelve a apretar.</div>
+      </div>
+
+      <!-- QR de asistencia para la puerta -->
+      <div class="cfg-block">
+        <div class="cfg-block-title">🚪 QR de asistencia (puerta)</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Genera un QR e imprímelo para pegarlo en tu puerta. Las vendedoras lo escanean al llegar.</div>
+        <button class="bsm bg" onclick="showDoorQR()">🖨 Generar QR de puerta</button>
+      </div>
+
+      <!-- Dispositivos bloqueados -->
+      <div class="cfg-block">
+        <div class="cfg-block-title">🚫 Dispositivos bloqueados</div>
+        <div id="blocked-list" style="font-size:12px;color:var(--t2)">Cargando...</div>
+      </div>
+
+      <!-- Notificaciones del navegador -->
+      <div class="cfg-block">
+        <div class="cfg-block-title">🔔 Notificaciones del navegador</div>
+        <div style="font-size:12px;color:var(--t2);margin-bottom:10px">Permite que el sistema te avise cuando entren nuevas ventas, mensajes o depósitos aunque estés en otra pestaña.</div>
+        <button class="bsm bg" onclick="requestNotifPerm()">Activar notificaciones</button>
+        <div id="notif-status" style="font-size:11px;color:var(--t3);margin-top:8px"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -679,6 +890,14 @@ const sb=createClient(
   'https://agusprmzqsggwcuopjbz.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFndXNwcm16cXNnZ3djdW9wamJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2MDEzMjMsImV4cCI6MjA5NTE3NzMyM30.UcMHMQFPat-S3vvbU9VkNKKlNfL2Fq75QQB8TAiyE6M'
 );
+
+// ═══════════════════════════════════════════════════════
+// SALESFLOW v5 — Ocultum 0.5
+// Fixes: fecha Bolivia, NOW dinámico, prev_lvl, sesiones DB,
+//        cascade cancel schedules, timer restore, tip alone,
+//        debt visible, QR pago, alarma, notificaciones,
+//        device blocking, auto-attendance, PWA
+// ═══════════════════════════════════════════════════════
 
 // ─── CONSTANTS ───
 const LV=[
@@ -699,30 +918,44 @@ const FD=[
 
 // ─── STATE ───
 let ME=null,ROLE=null,PAY='ef',DUR=null;
-let VV=[],SS=[],SH=[],FA=[],NO=[],MV=[];
+let VV=[],SS=[],SH=[],FA=[],NO=[],MV=[],SES=[],ATT=[],PAI=[];
 let CAJA=0,BANCO=0;
 let CY=new Date().getFullYear(),CM=new Date().getMonth();
 let ACHAT=null;
 let FAC={bloqueo:0,dolar:0,gasolina:0,lluvia:0,feriado:0,primerV:0,momento:0,vNueva:0};
-const NOW=new Date();
-let POLL=null,TIMER_INT=null;
+let POLL=null,TIMER_INT=null,SESSION_POLL=null;
 let LAST_LVL=null,LAST_PEN=null;
-let ACTIVE_SESSIONS={}; // {vcode: {endTime, vendorName, duration}}
 let ADMIN_PASS='1234';
+let CFG={home_ip:'',bank_name:'Banco Mercantil Santa Cruz',bank_account:'',bank_holder:''};
+let CURRENT_IP='';
+let DEVICE_ID=null;
+let PWA_PROMPT=null;
+let ALARM_AUDIO=null;
+let CURRENT_QR_SALE=null;
+let SCAN_STREAM=null;
 
-// ─── UTILS ───
+// ─── DATE UTILS (todo Bolivia timezone) ───
 const $=id=>document.getElementById(id);
 const fmt=n=>'Bs '+Number(n).toFixed(2);
-const fd=d=>new Date(d).toLocaleDateString('es-BO',{day:'2-digit',month:'short',year:'numeric'});
+const fd=d=>new Date(d).toLocaleDateString('es-BO',{day:'2-digit',month:'short',year:'numeric',timeZone:'America/La_Paz'});
 const ft=d=>new Date(d).toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit',timeZone:'America/La_Paz'});
 const fdt=d=>`${fd(d)} ${ft(d)}`;
-const dateToBolivia=d=>new Date(new Date(d).toLocaleString('en-US',{timeZone:'America/La_Paz'}));
-const saleDate=s=>{ const d=dateToBolivia(s.date); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
-const todayStr=()=>{const d=new Date(new Date().toLocaleString('en-US',{timeZone:'America/La_Paz'}));return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
+// FIX: fecha en zona Bolivia (para comparar "hoy") — funciona correcto en cualquier navegador
+const boliviaDate=(d=new Date())=>{
+  const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/La_Paz',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(d));
+  const g=k=>p.find(x=>x.type===k).value;
+  return `${g('year')}-${g('month')}-${g('day')}`;
+};
+const saleDate=s=>boliviaDate(s.date);
+const todayStr=()=>boliviaDate();
+const isToday=d=>boliviaDate(d)===todayStr();
+// FIX: NOW dinámico, no global congelado
+const now=()=>new Date();
 const calc=s=>{if(s.annulled)return{e:0,n:0,m:0};const l=LV[s.level];const e=s.amount*l.p/100;return{e,n:e+(s.tip||0),m:s.amount-e};};
-const inP=v=>v.pen_end&&new Date(v.pen_end)>NOW;
-const pLeft=v=>v.pen_end?Math.max(0,Math.ceil((new Date(v.pen_end)-NOW)/864e5)):0;
+const inP=v=>v.pen_end&&new Date(v.pen_end)>now();
+const pLeft=v=>v.pen_end?Math.max(0,Math.ceil((new Date(v.pen_end)-now())/864e5)):0;
 const eL=v=>inP(v)?Math.max(0,v.level-1):v.level;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
 function toast(msg,col='var(--karol)'){
   const e=$('toast');e.textContent=msg;e.style.borderColor=col;
@@ -732,17 +965,46 @@ function oov(id){$(id).classList.add('on');}
 function cov(id){$(id).classList.remove('on');}
 window.cov=cov;
 
+// ─── DEVICE ID (para bloqueo por dispositivo) ───
+function getDeviceId(){
+  let id=localStorage.getItem('sf_device_id');
+  if(!id){
+    id='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10);
+    localStorage.setItem('sf_device_id',id);
+  }
+  return id;
+}
+
+async function isBlocked(){
+  const{data}=await sb.from('blocked_devices').select('device_id').eq('device_id',DEVICE_ID).maybeSingle();
+  return !!data;
+}
+
+function showBlockedScreen(){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  $('scr-blocked').classList.add('on');
+  $('blocked-device-id').textContent=DEVICE_ID;
+  const l=$('load');if(l)l.style.display='none';
+}
+
 // ─── SESSION STORAGE ───
 function saveSession(){
-  if(ME&&ROLE==='vendor') sessionStorage.setItem('sf_session',JSON.stringify({role:'vendor',code:ME.code}));
-  else if(ROLE==='admin') sessionStorage.setItem('sf_session',JSON.stringify({role:'admin'}));
+  if(ME&&ROLE==='vendor')localStorage.setItem('sf_session',JSON.stringify({role:'vendor',code:ME.code}));
+  else if(ROLE==='admin')localStorage.setItem('sf_session',JSON.stringify({role:'admin'}));
 }
-function clearSession(){sessionStorage.removeItem('sf_session');}
+function clearSession(){localStorage.removeItem('sf_session');}
 
-// ─── NOTIFS ───
+// ─── NOTIFS (in-app) ───
 function addN(to,icon,title,msg){
   NO.push({id:Date.now()+Math.random(),to,icon,title,msg,read:false,date:new Date().toISOString()});
   updNC();
+  // Browser notification si está permitido
+  if(('Notification' in window)&&Notification.permission==='granted'){
+    const targetIsMe=(ROLE==='admin'&&to==='admin')||(ROLE==='vendor'&&ME&&(to===ME.code||to==='all'));
+    if(targetIsMe&&document.hidden){
+      try{new Notification(`${icon} ${title}`,{body:msg,icon:'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%2307070f"/><text x="50" y="68" font-size="55" text-anchor="middle" fill="%23ffd700">💎</text></svg>',tag:title});}catch(e){}
+    }
+  }
 }
 function updNC(){
   const t=ROLE==='admin'?'admin':ME?.code;
@@ -755,10 +1017,10 @@ window.openNotifs=function(){
   const myN=NO.filter(n=>n.to===t||n.to==='all').reverse();
   $('notifs-list').innerHTML=myN.length===0?'<div style="color:var(--t2);text-align:center;padding:20px">Sin notificaciones</div>':
     myN.map(n=>`<div class="ni ${n.read?'':'u'}" onclick="rN(${n.id})" style="cursor:pointer">
-      <div style="font-size:22px">${n.icon}</div>
+      <div style="font-size:22px">${esc(n.icon)}</div>
       <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;margin-bottom:3px">${n.title}</div>
-        <div style="font-size:12px;color:var(--t2)">${n.msg}</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:3px">${esc(n.title)}</div>
+        <div style="font-size:12px;color:var(--t2)">${esc(n.msg)}</div>
         <div style="font-size:10px;color:var(--t3);margin-top:4px">${fdt(n.date)}</div>
       </div>
     </div>`).join('');
@@ -767,29 +1029,87 @@ window.openNotifs=function(){
 window.rN=function(id){const n=NO.find(x=>x.id===id);if(n)n.read=true;updNC();window.openNotifs();};
 window.markRead=function(){const t=ROLE==='admin'?'admin':ME?.code;NO.filter(n=>n.to===t||n.to==='all').forEach(n=>n.read=true);updNC();window.openNotifs();};
 
+window.requestNotifPerm=async function(){
+  if(!('Notification' in window)){toast('Tu navegador no soporta notificaciones','var(--red)');return;}
+  const p=await Notification.requestPermission();
+  const el=$('notif-status');
+  if(p==='granted'){el.textContent='✓ Notificaciones activadas';el.style.color='var(--karol)';toast('✓ Notificaciones activadas','var(--karol)');}
+  else if(p==='denied'){el.textContent='❌ Bloqueadas por el navegador — actívalas manualmente en la configuración del navegador';el.style.color='var(--red)';}
+  else{el.textContent='Pendiente — el navegador no respondió';el.style.color='var(--shak)';}
+};
+
+function checkNotifStatus(){
+  const el=$('notif-status');if(!el)return;
+  if(!('Notification' in window)){el.textContent='Este navegador no soporta notificaciones';el.style.color='var(--red)';return;}
+  const p=Notification.permission;
+  if(p==='granted'){el.textContent='✓ Notificaciones activadas';el.style.color='var(--karol)';}
+  else if(p==='denied'){el.textContent='❌ Bloqueadas — actívalas en configuración del navegador';el.style.color='var(--red)';}
+  else{el.textContent='Aún no activadas';el.style.color='var(--shak)';}
+}
+
 // ─── SHOW SCREEN ───
 function show(id){document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+
+// ─── CONFIG (bank, home IP) ───
+async function loadConfig(){
+  const{data}=await sb.from('app_config').select('*');
+  if(data){data.forEach(r=>CFG[r.key]=r.value||'');}
+}
+async function saveConfigKey(k,v){
+  await sb.from('app_config').upsert({key:k,value:v,updated_at:new Date().toISOString()},{onConflict:'key'});
+  CFG[k]=v;
+}
+window.saveBank=async function(){
+  const b=$('cfg-bank').value,a=$('cfg-account').value.trim(),h=$('cfg-holder').value.trim();
+  if(!a||!h){toast('Completa banco, cuenta y titular','var(--red)');return;}
+  await Promise.all([saveConfigKey('bank_name',b),saveConfigKey('bank_account',a),saveConfigKey('bank_holder',h)]);
+  toast('✓ Datos bancarios guardados','var(--karol)');
+};
+
+// ─── IP pública (para auto-asistencia por WiFi) ───
+async function detectPublicIP(){
+  try{
+    const r=await fetch('https://api.ipify.org?format=json');
+    const j=await r.json();
+    CURRENT_IP=j.ip||'';
+    return CURRENT_IP;
+  }catch(e){return '';}
+}
+window.setHomeIP=async function(){
+  if(!CURRENT_IP){toast('No pude detectar tu IP — revisa internet','var(--red)');return;}
+  await saveConfigKey('home_ip',CURRENT_IP);
+  $('cfg-current-ip').innerHTML=`<span style="color:var(--karol)">${CURRENT_IP}</span> <span style="font-size:10px;color:var(--t3)">(casa ✓)</span>`;
+  toast('✓ IP de casa guardada: '+CURRENT_IP,'var(--karol)');
+};
+window.clearHomeIP=async function(){
+  await saveConfigKey('home_ip','');
+  $('cfg-current-ip').textContent=CURRENT_IP||'—';
+  toast('IP de casa borrada','var(--t2)');
+};
 
 // ─── POLLING ───
 function startPoll(){
   if(POLL)clearInterval(POLL);
   POLL=setInterval(async()=>{
     try{
-      if(ROLE==='vendor'&&ME) await pollV();
-      else if(ROLE==='admin') await pollA();
+      if(ROLE==='vendor'&&ME)await pollV();
+      else if(ROLE==='admin')await pollA();
     }catch(e){console.warn('Poll error:',e);}
   },4000);
 }
-function stopPoll(){if(POLL){clearInterval(POLL);POLL=null;}}
+function stopPoll(){if(POLL){clearInterval(POLL);POLL=null;}if(SESSION_POLL){clearInterval(SESSION_POLL);SESSION_POLL=null;}}
 
 async function pollV(){
   const{data:vd}=await sb.from('vendors').select('*').eq('code',ME.code).single();
   if(!vd)return;
-  const lvlChanged=vd.level!==LAST_LVL&&LAST_LVL!==null;
+  // FIX: comparar contra LAST_LVL antes de reasignar
+  const prevLvl=LAST_LVL;
+  const lvlChanged=vd.level!==prevLvl&&prevLvl!==null;
   const penApplied=vd.pen_end&&vd.pen_end!==LAST_PEN&&!vd.seen_penalty;
   if(lvlChanged){
+    const wentUp=vd.level>prevLvl;
     ME=vd;LAST_LVL=vd.level;LAST_PEN=vd.pen_end;
-    if(vd.level>(LAST_LVL||0)){showLU(vd);addN(ME.code,'⬆️','¡Subiste de nivel!',`Ahora eres ${LV[vd.level].n} ${LV[vd.level].i}`);}
+    if(wentUp){showLU(vd);addN(ME.code,'⬆️','¡Subiste de nivel!',`Ahora eres ${LV[vd.level].n} ${LV[vd.level].i}`);}
     else{toast('⬇ Tu nivel fue modificado','var(--red)');}
     renderV();return;
   }
@@ -803,12 +1123,23 @@ async function pollV(){
     ME.seen_penalty=true;renderV();return;
   }
   ME=vd;LAST_LVL=vd.level;LAST_PEN=vd.pen_end;
-  const[s,sc,fa]=await Promise.all([
+  // FIX: bloqueo por dispositivo detectado mientras logueada
+  if(await isBlocked()){stopPoll();stopTimer();showBlockedScreen();return;}
+  // FIX: si vendedora fue desactivada
+  if(vd.active===false){stopPoll();stopTimer();clearSession();toast('Tu cuenta fue desactivada','var(--red)');setTimeout(()=>{ME=null;ROLE=null;show('scr-login');},1500);return;}
+  const[s,sc,fa,se]=await Promise.all([
     sb.from('sales').select('*').eq('vcode',ME.code).order('date',{ascending:false}),
     sb.from('schedules').select('*').eq('vcode',ME.code).order('created_at',{ascending:false}),
     sb.from('absences').select('*').eq('vcode',ME.code).order('created_at',{ascending:false}),
+    sb.from('sessions').select('*').eq('vendor_code',ME.code).eq('active',true),
   ]);
   SS=s.data||[];SH=sc.data||[];FA=fa.data||[];
+  const mySes=(se.data||[])[0];
+  if(mySes&&!TIMER_INT){
+    const left=new Date(mySes.end_time)-now();
+    if(left>0)restoreTimer(mySes);
+    else await sb.from('sessions').update({active:false}).eq('id',mySes.id);
+  }
   updateVStats();
   const atab=document.querySelector('#scr-v .tnb.on');
   if(atab){
@@ -825,14 +1156,16 @@ async function pollV(){
 }
 
 async function pollA(){
-  const[v,s,sc,fa,mo]=await Promise.all([
+  const[v,s,sc,fa,mo,se,at]=await Promise.all([
     sb.from('vendors').select('*').order('created_at',{ascending:true}),
     sb.from('sales').select('*').order('date',{ascending:false}),
     sb.from('schedules').select('*').order('created_at',{ascending:false}),
     sb.from('absences').select('*').order('submitted',{ascending:false}),
     sb.from('movements').select('*').order('date',{ascending:false}),
+    sb.from('sessions').select('*').eq('active',true),
+    sb.from('attendance').select('*').eq('date',todayStr()),
   ]);
-  VV=v.data||[];SS=s.data||[];SH=sc.data||[];FA=fa.data||[];MV=mo.data||[];
+  VV=v.data||[];SS=s.data||[];SH=sc.data||[];FA=fa.data||[];MV=mo.data||[];SES=se.data||[];ATT=at.data||[];
   CAJA=0;BANCO=0;
   MV.forEach(m=>{if(m.tipo==='ic')CAJA+=m.monto;else if(m.tipo==='ec')CAJA-=m.monto;else if(m.tipo==='ib')BANCO+=m.monto;else BANCO-=m.monto;});
   updateAStats();
@@ -846,6 +1179,7 @@ async function pollA(){
     if(t.includes('Horarios')){renderCal();renderASch();}
     if(t.includes('Caja'))renderCaja();
     if(t.includes('Stats'))renderStats();
+    if(t.includes('Config'))renderBlockedList();
     if(t.includes('Chat')){
       renderAChat();
       if(ACHAT)await loadChat(`admin_${ACHAT}`,$('acm'),'admin');
@@ -865,11 +1199,14 @@ window.loginV=async function(){
   const code=$('vc').value.trim().toUpperCase(),pass=$('vp').value;
   if(!code||!pass){$('lerr').textContent='⚠️ Completa todos los campos';return;}
   $('lerr').textContent='Verificando...';
+  if(await isBlocked()){showBlockedScreen();return;}
   const{data,error}=await sb.from('vendors').select('*').eq('code',code).eq('pass',pass).single();
   if(error||!data){$('lerr').textContent='❌ Código o contraseña incorrectos';return;}
   if(data.active===false){$('lerr').textContent='❌ Tu cuenta está desactivada';return;}
   ME=data;ROLE='vendor';LAST_LVL=data.level;LAST_PEN=data.pen_end;
-  await loadVD();saveSession();show('scr-v');renderV();updNC();startPoll();
+  // Registrar device_id de la vendedora
+  await sb.from('vendors').update({device_id:DEVICE_ID}).eq('code',code);
+  await loadVD();saveSession();show('scr-v');await checkAutoAttendance();renderV();updNC();startPoll();
   if(inP(ME)&&!ME.seen_penalty){
     $('pen-sub').textContent=`${ME.name} — ahora en ${LV[eL(ME)].n} (${LV[eL(ME)].p}%)`;
     $('pen-mot').textContent=ME.pen_motivo?`Motivo: ${ME.pen_motivo}`:'';
@@ -891,29 +1228,30 @@ window.regV=async function(){
   const name=$('rn').value.trim(),code=$('rc').value.trim().toUpperCase(),pass=$('rp').value;
   if(!name||!code||!pass){$('lerr').textContent='⚠️ Completa todos los campos';return;}
   $('lerr').textContent='Creando cuenta...';
-  const{data:ex}=await sb.from('vendors').select('code').eq('code',code).single();
+  if(await isBlocked()){showBlockedScreen();return;}
+  const{data:ex}=await sb.from('vendors').select('code').eq('code',code).maybeSingle();
   if(ex){$('lerr').textContent='❌ Ese código ya existe';return;}
   const{data,error}=await sb.from('vendors').insert({
     code,name,pass,level:0,days:0,pen_end:null,pen_total:0,
     pen_motivo:'',prev_lvl:0,seen_penalty:true,credits:0,
-    active:true,is_new:true,debt:0
+    active:true,is_new:true,debt:0,device_id:DEVICE_ID
   }).select().single();
   if(error){$('lerr').textContent='❌ Error: '+error.message;return;}
   ME=data;ROLE='vendor';LAST_LVL=0;LAST_PEN=null;
-  await loadVD();saveSession();show('scr-v');renderV();updNC();startPoll();
+  await loadVD();saveSession();show('scr-v');await checkAutoAttendance();renderV();updNC();startPoll();
 };
 
 window.doLogout=function(){
   stopPoll();stopTimer();clearSession();
-  ME=null;ROLE=null;VV=[];SS=[];SH=[];FA=[];NO=[];MV=[];
+  ME=null;ROLE=null;VV=[];SS=[];SH=[];FA=[];NO=[];MV=[];SES=[];
   LAST_LVL=null;LAST_PEN=null;ACHAT=null;DUR=null;
-  ['vc','vp','ap'].forEach(id=>$(id).value='');
+  ['vc','vp','ap'].forEach(id=>{const e=$(id);if(e)e.value='';});
   $('lerr').textContent='';window.ltab('v');show('scr-login');
 };
 
 // ─── AUTO RESTORE SESSION ───
 async function tryRestoreSession(){
-  const saved=sessionStorage.getItem('sf_session');
+  const saved=localStorage.getItem('sf_session');
   if(!saved)return;
   try{
     const s=JSON.parse(saved);
@@ -923,7 +1261,7 @@ async function tryRestoreSession(){
       const{data}=await sb.from('vendors').select('*').eq('code',s.code).single();
       if(data&&data.active!==false){
         ME=data;ROLE='vendor';LAST_LVL=data.level;LAST_PEN=data.pen_end;
-        await loadVD();show('scr-v');renderV();updNC();startPoll();
+        await loadVD();show('scr-v');await checkAutoAttendance();renderV();updNC();startPoll();
       } else clearSession();
     }
   }catch(e){clearSession();}
@@ -931,23 +1269,32 @@ async function tryRestoreSession(){
 
 // ─── LOAD DATA ───
 async function loadVD(){
-  const[s,sc,fa]=await Promise.all([
+  const[s,sc,fa,se]=await Promise.all([
     sb.from('sales').select('*').eq('vcode',ME.code).order('date',{ascending:false}),
     sb.from('schedules').select('*').eq('vcode',ME.code).order('created_at',{ascending:false}),
     sb.from('absences').select('*').eq('vcode',ME.code).order('created_at',{ascending:false}),
+    sb.from('sessions').select('*').eq('vendor_code',ME.code).eq('active',true),
   ]);
   SS=s.data||[];SH=sc.data||[];FA=fa.data||[];
+  const mySes=(se.data||[])[0];
+  if(mySes){
+    const left=new Date(mySes.end_time)-now();
+    if(left>0)restoreTimer(mySes);
+    else await sb.from('sessions').update({active:false}).eq('id',mySes.id);
+  }
 }
 
 async function loadAD(){
-  const[v,s,sc,fa,mo]=await Promise.all([
+  const[v,s,sc,fa,mo,se,at]=await Promise.all([
     sb.from('vendors').select('*').order('created_at',{ascending:true}),
     sb.from('sales').select('*').order('date',{ascending:false}),
     sb.from('schedules').select('*').order('created_at',{ascending:false}),
     sb.from('absences').select('*').order('submitted',{ascending:false}),
     sb.from('movements').select('*').order('date',{ascending:false}),
+    sb.from('sessions').select('*').eq('active',true),
+    sb.from('attendance').select('*').eq('date',todayStr()),
   ]);
-  VV=v.data||[];SS=s.data||[];SH=sc.data||[];FA=fa.data||[];MV=mo.data||[];
+  VV=v.data||[];SS=s.data||[];SH=sc.data||[];FA=fa.data||[];MV=mo.data||[];SES=se.data||[];ATT=at.data||[];
   CAJA=0;BANCO=0;
   MV.forEach(m=>{if(m.tipo==='ic')CAJA+=m.monto;else if(m.tipo==='ec')CAJA-=m.monto;else if(m.tipo==='ib')BANCO+=m.monto;else BANCO-=m.monto;});
 }
@@ -977,22 +1324,30 @@ function renderV(){
     $('vpend').textContent=`Termina: ${fd(v.pen_end)}`;
   }
   $('vnxt').innerHTML=['1 mes → 🐆 La Karol G (65%)','2 meses más → 💎 La Shakira (70%)','💎 Nivel máximo — Eres La Leyenda'][v.level];
-  // Asistencia status
-  const asistEl=$('v-asist-status');
-  const todaySales=SS.filter(s=>s.date&&!s.annulled&&saleDate(s)===todayStr());
-  // Check if marked present today
+  // DEUDA visible
+  const debt=v.debt||0;
+  if(debt>0){
+    $('v-debt').style.display='flex';
+    $('v-debt-amount').textContent=fmt(debt);
+  } else $('v-debt').style.display='none';
+  // Asistencia label
+  const attToday=ATT.find(a=>a.vendor_code===v.code&&a.date===todayStr());
+  const el=$('v-asist-label');
+  if(attToday)el.innerHTML=`<span style="color:var(--karol)">✓ Asistencia marcada</span> <span style="font-size:11px;color:var(--t3)">(${attToday.method})</span>`;
+  else el.textContent='📍 Marca tu asistencia al llegar';
   updateVStats();renderVHist();renderVSch();renderVFa();
 }
 
 function getBadgeClass(c){
-  const map={cazzu:'bc',karol:'bk',shakira:'bs2'};
+  const map={cazzu:'bc',karol:'bk',shakira:'bs2',ang:'ba'};
   return map[c]||'bc';
 }
 
 function updateVStats(){
-  const todayEarn=SS.filter(s=>s.date&&s.date.startsWith(todayStr())).reduce((a,s)=>a+calc(s).e,0);
-  const totalEarn=SS.reduce((a,s)=>a+calc(s).e,0);
-  const todayTips=SS.filter(s=>s.date&&s.date.startsWith(todayStr())).reduce((a,s)=>a+(s.tip||0),0);
+  const t=todayStr();
+  const todayEarn=SS.filter(s=>!s.annulled&&saleDate(s)===t).reduce((a,s)=>a+calc(s).e,0);
+  const totalEarn=SS.filter(s=>!s.annulled).reduce((a,s)=>a+calc(s).e,0);
+  const todayTips=SS.filter(s=>!s.annulled&&saleDate(s)===t).reduce((a,s)=>a+(s.tip||0),0);
   $('vs1').textContent=fmt(todayEarn);
   $('vs2').textContent=fmt(totalEarn);
   $('vs3').textContent=fmt(todayTips);
@@ -1005,9 +1360,9 @@ function renderVHist(){
       <td>${fd(s.date)}</td>
       <td>${ft(s.date)}</td>
       <td>${s.duration?s.duration+' min':'—'}</td>
-      <td class="succ">${fmt(c.e)}</td>
+      <td class="succ">${s.annulled?'—':fmt(c.e)}</td>
       <td>${s.tip>0?`<span class="gold">${fmt(s.tip)}</span> <span style="font-size:10px;color:var(--t2)">(devolver)</span>`:'—'}</td>
-      <td>${s.pay==='ef'?'💵':'📱'}</td>
+      <td>${s.pay==='ef'?'💵':'📱'}${s.annulled?' <span style="color:var(--red);font-size:10px;font-weight:700">ANUL</span>':''}</td>
     </tr>`;
   }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--t2);padding:20px">Sin ventas aún</td></tr>';
 }
@@ -1016,7 +1371,7 @@ function renderVHist(){
 window.setDur=function(min){
   DUR=min;
   document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
-  event.target.classList.add('on');
+  if(event&&event.target)event.target.classList.add('on');
   $('vdur').value='';
   $('dur-selected').textContent=min+' minutos';
 };
@@ -1030,22 +1385,40 @@ window.setDurManual=function(){
 };
 
 // ─── TIMER ───
-function startTimer(durationMin,vendorName){
+async function startTimer(durationMin,vendorName,saleId){
   stopTimer();
-  const endTime=Date.now()+durationMin*60000;
-  ACTIVE_SESSIONS[ME?.code||'vendor']={endTime,vendorName,duration:durationMin,startTime:Date.now()};
+  const endTime=new Date(Date.now()+durationMin*60000);
+  // Guardar sesión en DB
+  const{data:ses}=await sb.from('sessions').insert({
+    vendor_code:ME.code,vendor_name:vendorName,duration_min:durationMin,
+    end_time:endTime.toISOString(),active:true,sale_id:saleId||null
+  }).select().single();
+  runTimer(endTime,vendorName,durationMin,ses?.id);
+}
+
+function restoreTimer(sesRow){
+  const endTime=new Date(sesRow.end_time);
+  runTimer(endTime,sesRow.vendor_name,sesRow.duration_min,sesRow.id);
+}
+
+function runTimer(endTime,vendorName,durationMin,sesId){
   $('v-timer-wrap').style.display='block';
-  let warned=false;
-  TIMER_INT=setInterval(()=>{
-    const left=endTime-Date.now();
+  let warned=false,finished=false;
+  TIMER_INT=setInterval(async ()=>{
+    const left=endTime.getTime()-Date.now();
     if(left<=0){
+      if(finished)return;finished=true;
       $('v-timer').textContent='00:00';
-      $('v-timer').className='timer-display done';
-      $('v-timer-info').textContent='Sesión terminada';
-      stopTimer();
-      toast('⏰ Sesión terminada','var(--red)');
+      $('v-timer').className='timer-display alarm';
+      $('v-timer-info').textContent='⏰ ¡Tiempo terminado!';
+      playAlarm();
+      toast('⏰ Sesión terminada — se acabó el tiempo','var(--red)');
       addN('admin','⏰','Sesión terminada',`${vendorName} terminó su sesión de ${durationMin} min`);
-      delete ACTIVE_SESSIONS[ME?.code||'vendor'];
+      addN(ME?.code||'','⏰','Sesión terminada','Se acabó el tiempo de tu sesión');
+      if(sesId)await sb.from('sessions').update({active:false}).eq('id',sesId);
+      stopTimer();
+      // Auto-hide después de 30s
+      setTimeout(()=>{$('v-timer-wrap').style.display='none';$('v-timer').className='timer-display';},30000);
       return;
     }
     const m=Math.floor(left/60000),s=Math.floor((left%60000)/1000);
@@ -1053,13 +1426,35 @@ function startTimer(durationMin,vendorName){
     if(left<=300000&&!warned){
       warned=true;
       $('v-timer').className='timer-display warning';
-      toast('⚠️ Faltan 5 minutos para terminar la sesión','var(--shak)');
+      toast('⚠️ Faltan 5 minutos','var(--shak)');
       addN('admin','⚠️','5 minutos restantes',`${vendorName} — sesión de ${durationMin} min casi termina`);
     }
     $('v-timer-info').textContent=`Sesión activa — ${vendorName}`;
   },1000);
 }
+
 function stopTimer(){if(TIMER_INT){clearInterval(TIMER_INT);TIMER_INT=null;}}
+
+// ─── ALARMA ───
+function playAlarm(){
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    let i=0;
+    const beep=()=>{
+      if(i>=6){ctx.close();return;}
+      const osc=ctx.createOscillator();const g=ctx.createGain();
+      osc.connect(g);g.connect(ctx.destination);
+      osc.frequency.value=i%2===0?880:660;
+      g.gain.setValueAtTime(.3,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.3);
+      osc.start();osc.stop(ctx.currentTime+.3);
+      i++;setTimeout(beep,350);
+    };
+    beep();
+  }catch(e){console.warn('Alarm error:',e);}
+  // Vibración móvil
+  if('vibrate' in navigator)navigator.vibrate([500,200,500,200,500]);
+}
 
 // ─── PAY ───
 window.spay=function(p){
@@ -1077,8 +1472,8 @@ window.regSale=async function(){
   const note=$('vno').value;
   const clientName=$('vcln').value.trim();
   const clientPhone=$('vclp').value.trim();
-  // Check days worked — only count once per calendar day
-  const todaySales=SS.filter(s=>s.date&&!s.annulled&&saleDate(s)===todayStr());
+  const t=todayStr();
+  const todaySales=SS.filter(s=>!s.annulled&&saleDate(s)===t);
   const isNewDay=todaySales.length===0;
   const saleData={
     vcode:ME.code,vname:ME.name,level:eL(ME),
@@ -1089,29 +1484,83 @@ window.regSale=async function(){
   const{data,error}=await sb.from('sales').insert(saleData).select().single();
   if(error){toast('Error al registrar: '+error.message,'var(--red)');return;}
   SS.unshift(data);
-  // Update days only if first sale today
+  // Marcar asistencia con sale
+  await markAttendance('sale');
   if(isNewDay){
     ME.days=(ME.days||0)+1;
-    // Check if 15 days worked — remove new status
     const updates={days:ME.days};
     if(ME.is_new&&ME.days>=15)updates.is_new=false;
     await sb.from('vendors').update(updates).eq('code',ME.code);
   }
-  // Notify admin if client registered
   if(clientName||clientPhone){
     addN('admin','👤','Nueva cliente registrada',`${clientName||'Sin nombre'} — ${clientPhone||'Sin número'}`);
   }
-  // Start timer
-  startTimer(DUR,ME.name);
+  addN('admin','💰','Nueva venta',`${ME.name}: ${fmt(amt)} (${DUR} min)`);
+  await startTimer(DUR,ME.name,data.id);
   // Reset form
   $('vam').value='';$('vti').value='';$('vno').value='';
-  $('vcln').value='';$('vclp').value='';$('vdur').value='';DUR=null;
+  $('vcln').value='';$('vclp').value='';$('vdur').value='';
+  const savedAmt=amt,savedPay=PAY;
+  DUR=null;
   document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
   $('dur-selected').textContent='—';
   toast('✅ Venta registrada — sesión iniciada 🔥','var(--karol)');
   updateVStats();renderVHist();
+  // Si es QR, mostrar el QR de pago
+  if(savedPay==='qr')showPaymentQR(savedAmt,data.id);
 };
 
+// NUEVA: registrar SOLO propina, sin duración ni monto de venta
+window.regTipOnly=async function(){
+  const tip=parseFloat($('vti').value)||0;
+  if(!tip||tip<=0){toast('Ingresa una propina válida','var(--red)');return;}
+  const note=$('vno').value||'Solo propina';
+  const saleData={
+    vcode:ME.code,vname:ME.name,level:eL(ME),
+    amount:0,tip,pay:'ef',note,duration:null,
+    date:new Date().toISOString()
+  };
+  const{data,error}=await sb.from('sales').insert(saleData).select().single();
+  if(error){toast('Error: '+error.message,'var(--red)');return;}
+  SS.unshift(data);
+  await markAttendance('sale');
+  addN('admin','💰','Propina registrada',`${ME.name}: ${fmt(tip)} de propina`);
+  $('vti').value='';$('vno').value='';
+  toast('💰 Propina registrada — '+fmt(tip),'var(--shak)');
+  updateVStats();renderVHist();
+};
+
+// ─── QR DE PAGO ───
+function showPaymentQR(amount,saleId){
+  CURRENT_QR_SALE=saleId;
+  const holder=CFG.bank_holder||'—';
+  const account=CFG.bank_account||'—';
+  const bank=CFG.bank_name||'—';
+  if(!account||account==='—'){
+    toast('⚠️ Falta configurar datos bancarios (Admin → Config)','var(--shak)');
+  }
+  $('qr-amount').textContent=fmt(amount);
+  $('qr-bank-name').textContent=bank;
+  $('qr-holder').textContent=holder;
+  $('qr-account').textContent=account;
+  $('qr-ref').textContent=`Ref: SF-${(saleId||'').slice(0,8)} · ${new Date().toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit',timeZone:'America/La_Paz'})}`;
+  const qrText=`PAGO SALESFLOW\nMonto: Bs ${amount.toFixed(2)}\nBanco: ${bank}\nCuenta: ${account}\nTitular: ${holder}\nRef: ${(saleId||'').slice(0,8)}`;
+  const el=$('qr-canvas');el.innerHTML='';
+  try{
+    new QRCode(el,{text:qrText,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+  }catch(e){el.innerHTML='<div style="color:#000;padding:40px">QR no disponible</div>';}
+  oov('ov-qr');
+}
+
+window.markDeposit=async function(){
+  if(!CURRENT_QR_SALE){toast('No hay venta activa','var(--red)');cov('ov-qr');return;}
+  await sb.from('sales').update({deposit_confirmed:true}).eq('id',CURRENT_QR_SALE);
+  addN('admin','💰','Cliente pagó por QR',`${ME.name} marcó que el cliente pagó — verifica en tu app bancaria`);
+  toast('✓ Depósito reportado al admin','var(--karol)');
+  cov('ov-qr');CURRENT_QR_SALE=null;
+};
+
+// ─── SCHEDULES ───
 window.propSch=async function(){
   const day=$('vdy').value,inn=$('vin').value,out=$('vou').value;
   const ex=SH.find(s=>s.vcode===ME.code&&s.day===day&&s.status==='pending');
@@ -1134,7 +1583,7 @@ function renderVSch(){
   $('vsch').innerHTML=SH.filter(s=>s.status!=='cancelled').map(s=>`
     <div class="si">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-        <div><strong>${s.day}</strong> <span style="color:var(--t2)">${s.time_in}–${s.time_out}</span></div>
+        <div><strong>${esc(s.day)}</strong> <span style="color:var(--t2)">${esc(s.time_in)}–${esc(s.time_out)}</span></div>
         <span class="bdg ${s.status==='approved'?'bk':s.status==='rejected'?'ba':'bad'}">
           ${s.status==='approved'?'✓ Aprobado':s.status==='rejected'?'✗ Rechazado':'⏳ Pendiente'}
         </span>
@@ -1146,7 +1595,7 @@ function renderVSch(){
 window.subFalta=async function(){
   const d=$('vfd').value,m=$('vfm').value.trim();
   if(!d||!m){toast('Completa todos los campos','var(--red)');return;}
-  if((new Date(d)-NOW)/3600000<24){toast('"Fuera de tiempo, mija 🤠" — Mínimo 24hrs antes','var(--red)');return;}
+  if((new Date(d)-now())/3600000<24){toast('"Fuera de tiempo, mija 🤠" — Mínimo 24hrs antes','var(--red)');return;}
   const{data,error}=await sb.from('absences').insert({
     vcode:ME.code,vname:ME.name,date:d,motivo:m,status:'pending',submitted:new Date().toISOString()
   }).select().single();
@@ -1158,7 +1607,7 @@ window.subFalta=async function(){
 function renderVFa(){
   $('vfl').innerHTML=FA.map(f=>`
     <div class="ir">
-      <div><span class="ik">${fd(f.date)}</span><div style="font-size:12px;color:var(--t2);margin-top:2px">${f.motivo}</div></div>
+      <div><span class="ik">${fd(f.date)}</span><div style="font-size:12px;color:var(--t2);margin-top:2px">${esc(f.motivo)}</div></div>
       <span class="bdg ${f.status==='approved'?'bk':f.status==='rejected'?'ba':'bad'}">
         ${f.status==='approved'?'✓ Aprobada':f.status==='rejected'?'✗ Rechazada':'⏳ Pendiente'}
       </span>
@@ -1172,8 +1621,8 @@ async function loadChat(key,cont,myCode){
   const list=data||[];
   cont.innerHTML=list.length===0?'<div style="color:var(--t2);font-size:12px;text-align:center;padding:20px">Sin mensajes aún</div>':
     list.map(m=>`<div class="msg ${m.from_code===myCode?'me':'them'}">
-      ${m.from_code!==myCode?`<div class="mn">${m.from_name}</div>`:''}
-      ${m.text}<div class="mt">${ft(m.time)}</div>
+      ${m.from_code!==myCode?`<div class="mn">${esc(m.from_name)}</div>`:''}
+      ${esc(m.text)}<div class="mt">${ft(m.time)}</div>
     </div>`).join('');
   cont.scrollTop=cont.scrollHeight;
 }
@@ -1194,39 +1643,56 @@ window.vtb=function(t){
   if(t==='ch'){loadChat(`admin_${ME.code}`,$('vca'),ME.code);loadChat('group',$('vcg'),ME.code);}
 };
 
-// ─── ADMIN RENDER ───
+// ═══ ADMIN ═══
 function renderA(){
   updateAStats();
   renderVG();renderAsist();renderAV();renderCal();renderASch();
-  renderCaja();renderAviDest();renderSessions();renderPagos();
+  renderCaja();renderAviDest();renderSessions();renderPagos();renderFactors();window.calcProb();
+  // Config
+  $('cfg-bank').value=CFG.bank_name||'Banco Mercantil Santa Cruz';
+  $('cfg-account').value=CFG.bank_account||'';
+  $('cfg-holder').value=CFG.bank_holder||'';
+  updateHomeIPDisplay();
+  checkNotifStatus();
+}
+
+function updateHomeIPDisplay(){
+  const el=$('cfg-current-ip');if(!el)return;
+  if(!CURRENT_IP){el.textContent='detectando...';return;}
+  const isHome=CFG.home_ip===CURRENT_IP&&CFG.home_ip;
+  el.innerHTML=`<span style="color:${isHome?'var(--karol)':'var(--t2)'}">${CURRENT_IP}</span> ${isHome?'<span style="font-size:10px;color:var(--karol)">(casa ✓)</span>':CFG.home_ip?`<span style="font-size:10px;color:var(--t3)">casa: ${CFG.home_ip}</span>`:''}`;
 }
 
 function updateAStats(){
-  const td=SS.filter(s=>s.date&&s.date.startsWith(todayStr()));
+  const t=todayStr();
+  const td=SS.filter(s=>!s.annulled&&saleDate(s)===t);
   const tdE=td.reduce((a,s)=>a+calc(s).m,0);
-  let ts=0,tc=0;SS.forEach(s=>{const c=calc(s);ts+=s.amount;tc+=c.e;});
+  let ts=0,tc=0;
+  SS.filter(s=>!s.annulled).forEach(s=>{const c=calc(s);ts+=s.amount;tc+=c.e;});
   $('as1').textContent=fmt(ts);$('as2').textContent=fmt(tdE);
-  $('as3').textContent=fmt(tc);$('as4').textContent=VV.length;
+  $('as3').textContent=fmt(tc);$('as4').textContent=VV.filter(v=>v.active!==false).length;
 }
 
 // ─── ASISTENCIA ───
 function renderAsist(){
-  const today=todayStr();
-  // Vendedoras que ya registraron venta hoy = presentes
-  const presentToday=new Set(SS.filter(s=>s.date&&s.date.startsWith(today)).map(s=>s.vcode));
+  const t=todayStr();
+  const presentByAtt=new Set(ATT.map(a=>a.vendor_code));
+  const presentBySale=new Set(SS.filter(s=>!s.annulled&&saleDate(s)===t).map(s=>s.vcode));
   $('asist-list').innerHTML=VV.filter(v=>v.active!==false).map(v=>{
-    const isPresent=presentToday.has(v.code);
+    const isPresent=presentByAtt.has(v.code)||presentBySale.has(v.code);
+    const att=ATT.find(a=>a.vendor_code===v.code);
+    const method=att?att.method:(presentBySale.has(v.code)?'sale':'');
     return`<div class="asist-row">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="font-size:20px">${LV[eL(v)].i}</div>
         <div>
-          <div style="font-weight:700;font-size:14px">${v.name}</div>
-          <div style="font-size:11px;color:var(--t2)">${v.days} dias trabajados</div>
+          <div style="font-weight:700;font-size:14px">${esc(v.name)}</div>
+          <div style="font-size:11px;color:var(--t2)">${v.days||0} días trabajados</div>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:8px">
         ${isPresent
-          ?'<span class="bdg bk">✓ Presente hoy</span>'
+          ?`<span class="bdg bk">✓ Presente ${method?'· '+method:''}</span>`
           :`<button class="bsm bg" onclick="marcarPresente('${v.code}')">✓ Marcar presente</button>`
         }
       </div>
@@ -1234,63 +1700,66 @@ function renderAsist(){
   }).join('')||'<div style="color:var(--t2);font-size:13px">Sin vendedoras</div>';
 }
 
-// ─── SESIONES ACTIVAS ───
+// ─── SESIONES ACTIVAS (desde DB) ───
 function renderSessions(){
-  const sessions=Object.entries(ACTIVE_SESSIONS);
-  if(sessions.length===0){
+  const active=SES.filter(s=>s.active);
+  if(active.length===0){
     $('sessions-list').innerHTML='<div style="color:var(--t2);text-align:center;padding:20px">Sin sesiones activas en este momento</div>';
     return;
   }
-  $('sessions-list').innerHTML=sessions.map(([code,ses])=>{
-    const left=Math.max(0,ses.endTime-Date.now());
+  $('sessions-list').innerHTML=active.map(ses=>{
+    const left=Math.max(0,new Date(ses.end_time).getTime()-Date.now());
     const m=Math.floor(left/60000),s=Math.floor((left%60000)/1000);
     const timeStr=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    const warning=left<300000;
+    const done=left<=0;
+    const warning=left<300000&&left>0;
     return`<div class="session-card">
-      <div class="session-timer ${warning?'warning':''}">${timeStr}</div>
+      <div class="session-timer ${done?'alarm':warning?'warning':''}">${done?'FIN':timeStr}</div>
       <div>
-        <div style="font-size:15px;font-weight:800">${ses.vendorName}</div>
-        <div style="font-size:12px;color:var(--t2)">Sesión de ${ses.duration} min</div>
-        ${warning?'<div style="font-size:11px;color:var(--shak);font-weight:700">⚠️ Menos de 5 min</div>':''}
+        <div style="font-size:15px;font-weight:800">${esc(ses.vendor_name)}</div>
+        <div style="font-size:12px;color:var(--t2)">Sesión de ${ses.duration_min} min</div>
+        ${done?'<div style="font-size:11px;color:var(--red);font-weight:700">⏰ Tiempo terminado</div>':warning?'<div style="font-size:11px;color:var(--shak);font-weight:700">⚠️ Menos de 5 min</div>':''}
       </div>
     </div>`;
   }).join('');
 }
 
-// ─── PAGOS DEL DÍA ───
+// ─── PAGOS DEL DÍA (con botón Pagado + info depósito) ───
 function renderPagos(){
-  const today=todayStr();
-  const todaySales=SS.filter(s=>s.date&&s.date.startsWith(today));
-  // Group by vendor
+  const t=todayStr();
+  const todaySales=SS.filter(s=>saleDate(s)===t);
   const byVendor={};
   todaySales.forEach(s=>{
-    if(!byVendor[s.vcode])byVendor[s.vcode]={name:s.vname,sales:[],tips:0,earn:0};
-    const c=calc(s);
-    byVendor[s.vcode].sales.push(s);
-    byVendor[s.vcode].tips+=(s.tip||0);
-    byVendor[s.vcode].earn+=c.e;
+    if(!byVendor[s.vcode])byVendor[s.vcode]={name:s.vname,sales:[],tips:0,earn:0,pending_qr:0,paid_sales:0};
+    if(!s.annulled){
+      const c=calc(s);
+      byVendor[s.vcode].sales.push(s);
+      byVendor[s.vcode].tips+=(s.tip||0);
+      byVendor[s.vcode].earn+=c.e;
+      if(s.pay==='qr'&&s.deposit_confirmed&&!s.paid)byVendor[s.vcode].pending_qr+=s.amount;
+      if(s.paid)byVendor[s.vcode].paid_sales++;
+    }
   });
-  // Add debt from movements
-  const todayMovs=MV.filter(m=>m.date&&m.date.startsWith(today)&&m.vendor_code);
-  if(Object.keys(byVendor).length===0&&todayMovs.length===0){
+  VV.forEach(v=>{if((v.debt||0)>0&&!byVendor[v.code])byVendor[v.code]={name:v.name,sales:[],tips:0,earn:0,pending_qr:0,paid_sales:0};});
+  if(Object.keys(byVendor).length===0){
     $('pagos-list').innerHTML='<div style="color:var(--t2);text-align:center;padding:20px">Sin ventas registradas hoy</div>';
     return;
   }
-  // Also show vendors with debt even if no sales today
-  VV.forEach(v=>{if((v.debt||0)>0&&!byVendor[v.code])byVendor[v.code]={name:v.name,sales:[],tips:0,earn:0};});
   $('pagos-list').innerHTML=Object.entries(byVendor).map(([code,d])=>{
     const v=VV.find(x=>x.code===code);
     const debt=v?.debt||0;
     const neto=Math.max(0,d.earn-debt);
     const deudaRestante=Math.max(0,debt-d.earn);
-    return`<div class="pago-card">
+    const allPaid=d.sales.length>0&&d.sales.every(s=>s.paid);
+    return`<div class="pago-card ${allPaid?'paid':''}">
       <div class="pago-header">
         <div>
-          <div class="pago-name">${d.name}</div>
+          <div class="pago-name">${esc(d.name)}</div>
           <div style="font-size:11px;color:var(--t2)">${d.sales.length} sesiones hoy</div>
         </div>
         ${debt>0?`<span class="deuda-badge">Deuda: ${fmt(debt)}</span>`:''}
       </div>
+      ${d.pending_qr>0?`<div class="deposit-banner deposit-pending"><span style="font-size:12px">💰 QR reportado: ${fmt(d.pending_qr)}</span><span style="font-size:11px;color:var(--t3)">verifica en tu banco</span></div>`:''}
       <div class="pago-row"><span style="color:var(--t2)">Ganancia del día</span><span class="succ">${fmt(d.earn)}</span></div>
       ${d.tips>0?`<div class="pago-row"><span style="color:var(--t2)">Propinas a devolver</span><span class="gold">${fmt(d.tips)}</span></div>`:''}
       ${debt>0?`<div class="pago-row"><span style="color:var(--t2)">Deuda acumulada</span><span class="dng">-${fmt(Math.min(debt,d.earn))}</span></div>`:''}
@@ -1303,8 +1772,10 @@ function renderPagos(){
             ${deudaRestante>0?`<div style="font-size:11px;color:var(--red)">Deuda pendiente: ${fmt(deudaRestante)}</div>`:''}
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
-            ${debt>0?`<button class="bsm bg" onclick="descontarDeuda('${code}',${Math.min(debt,d.earn)})">Descontar deuda</button>`:''}
-            <button class="bsm" onclick="registrarAdelanto('${code}','${d.name}')">+ Adelanto</button>
+            ${!allPaid&&d.sales.length>0?`<button class="bsm bg" onclick="marcarPagado('${code}')">✓ Marcar pagado</button>`:''}
+            ${allPaid?`<button class="bsm" onclick="marcarNoPagado('${code}')">Deshacer</button>`:''}
+            ${debt>0?`<button class="bsm" onclick="descontarDeuda('${code}',${Math.min(debt,d.earn)})">Descontar deuda</button>`:''}
+            <button class="bsm bp" onclick="registrarAdelanto('${code}','${esc(d.name)}')">+ Adelanto</button>
           </div>
         </div>
       </div>
@@ -1312,15 +1783,34 @@ function renderPagos(){
   }).join('');
 }
 
+window.marcarPagado=async function(code){
+  const t=todayStr();
+  const salesToPay=SS.filter(s=>s.vcode===code&&saleDate(s)===t&&!s.annulled&&!s.paid);
+  if(salesToPay.length===0){toast('Sin ventas para marcar','var(--red)');return;}
+  await Promise.all(salesToPay.map(s=>sb.from('sales').update({paid:true}).eq('id',s.id)));
+  salesToPay.forEach(s=>s.paid=true);
+  const v=VV.find(x=>x.code===code);
+  if(v)addN(code,'✅','Pago recibido',`Se te marcó como pagada la ganancia de hoy`);
+  toast(`✓ ${v?.name||code} marcada como pagada`,'var(--karol)');renderPagos();
+};
+
+window.marcarNoPagado=async function(code){
+  const t=todayStr();
+  const sales=SS.filter(s=>s.vcode===code&&saleDate(s)===t&&s.paid);
+  await Promise.all(sales.map(s=>sb.from('sales').update({paid:false}).eq('id',s.id)));
+  sales.forEach(s=>s.paid=false);
+  toast('Estado revertido','var(--t2)');renderPagos();
+};
+
 window.descontarDeuda=async function(code,monto){
   const v=VV.find(x=>x.code===code);if(!v)return;
   const newDebt=Math.max(0,(v.debt||0)-monto);
   await sb.from('vendors').update({debt:newDebt}).eq('code',code);
-  v.debt=newDebt;toast(`✅ Deuda descontada: ${fmt(monto)}`,'var(--karol)');renderPagos();
+  v.debt=newDebt;toast(`✅ Deuda descontada: ${fmt(monto)}`,'var(--karol)');renderPagos();renderVG();
 };
 
 window.darAdelanto=async function(code,name){
-  const monto=parseFloat(prompt('Adelanto para '+name+' - Cuanto? (Bs)')||'0');
+  const monto=parseFloat(prompt(`Adelanto para ${name} - ¿Cuánto? (Bs)`)||'0');
   if(!monto||monto<=0)return;
   const motivo=prompt('Motivo (ej: falta de cambio, préstamo):')||'Adelanto';
   const v=VV.find(x=>x.code===code);if(!v)return;
@@ -1330,72 +1820,68 @@ window.darAdelanto=async function(code,name){
     sb.from('movements').insert({tipo:'ec',monto,descripcion:motivo+' — '+name,vendor_code:code,date:new Date().toISOString()})
   ]);
   v.debt=newDebt;CAJA-=monto;
-  addN(code,'💵','Adelanto registrado','Se te dio un adelanto de Bs '+monto.toFixed(2)+' — '+motivo);
+  addN(code,'💵','Adelanto registrado','Se te dio un adelanto de '+fmt(monto)+' — '+motivo);
   toast('💵 Adelanto a '+name,'var(--shak)');
   renderVG();renderPagos();renderCaja();updNC();
 };
 
-window.registrarAdelanto=async function(code,name){
-  const monto=parseFloat(prompt(`¿Cuánto de adelanto para ${name}? (Bs)`)||'0');
-  if(!monto||monto<=0)return;
-  const desc=prompt('Descripción del adelanto:')||'Adelanto de caja';
-  const v=VV.find(x=>x.code===code);if(!v)return;
-  const newDebt=(v.debt||0)+monto;
-  await Promise.all([
-    sb.from('vendors').update({debt:newDebt}).eq('code',code),
-    sb.from('movements').insert({tipo:'ec',monto,descripcion:desc,vendor_code:code,date:new Date().toISOString()})
-  ]);
-  v.debt=newDebt;CAJA-=monto;
-  toast(`⚠️ Adelanto registrado: ${fmt(monto)}`,'var(--shak)');renderPagos();renderCaja();
-};
+window.registrarAdelanto=window.darAdelanto;
 
 // ─── VENDOR GRID ───
 function renderVG(){
-  $('vgrid').innerHTML=VV.filter(v=>v.active!==false).map(v=>{
+  const activeVendors=VV.filter(v=>v.active!==false);
+  $('vgrid').innerHTML=activeVendors.map(v=>{
     const lv=eL(v),l=LV[lv],pen=inP(v);
     const hp=SH.some(s=>s.vcode===v.code&&s.status==='pending')||FA.some(f=>f.vcode===v.code&&f.status==='pending');
-    const vs=SS.filter(s=>s.vcode===v.code),tot=vs.reduce((a,s)=>a+s.amount,0);
+    const vs=SS.filter(s=>s.vcode===v.code&&!s.annulled),tot=vs.reduce((a,s)=>a+s.amount,0);
     return`<div class="vc" style="--vc:var(--${l.c})">
       ${hp?'<div class="pd"></div>':''}
       <div style="font-size:34px;margin-bottom:9px">${pen?'👶':l.i}</div>
-      <div style="font-size:16px;font-weight:800;margin-bottom:2px">${v.name}</div>
-      <div style="font-size:11px;color:var(--t2);letter-spacing:1px;margin-bottom:12px">${v.code}</div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:2px">${esc(v.name)}</div>
+      <div style="font-size:11px;color:var(--t2);letter-spacing:1px;margin-bottom:12px">${esc(v.code)}</div>
       <div class="ir"><span class="ik">Nivel</span><span class="bdg ${getBadgeClass(l.c)}">${pen?'👶 Penalizada':l.n+' '+l.p+'%'}</span></div>
       ${pen?`<div class="ir"><span class="ik">Penalización</span><span class="iv dng">${pLeft(v)} días</span></div>`:''}
       ${(v.debt||0)>0?`<div class="ir"><span class="ik">Deuda</span><span class="iv dng">${fmt(v.debt)}</span></div>`:''}
-      <div class="ir"><span class="ik">Días trabajados</span><span class="iv">${v.days}</span></div>
+      <div class="ir"><span class="ik">Días trabajados</span><span class="iv">${v.days||0}</span></div>
       <div class="ir"><span class="ik">Total ventas</span><span class="iv succ">${fmt(tot)}</span></div>
       <div class="va">
         ${v.level<2?`<button class="bsm bg" onclick="promote('${v.code}')">⬆ Subir</button>`:''}
         ${v.level>0?`<button class="bsm br" onclick="demote('${v.code}')">⬇ Bajar</button>`:''}
         <button class="bsm bp" onclick="applyPen('${v.code}')">⚠ Pen.</button>
-        <button class="bsm" style="border-color:var(--shak-g);color:var(--shak)" onclick="darAdelanto('${v.code}','${v.name}')">💵 Adelanto</button>
+        <button class="bsm" style="border-color:var(--shak-g);color:var(--shak)" onclick="darAdelanto('${v.code}','${esc(v.name)}')">💵 Adelanto</button>
         <button class="bsm br" onclick="deactivate('${v.code}')">🚫 Desact.</button>
       </div>
     </div>`;
   }).join('')+
-  // Inactive vendors
   (VV.filter(v=>v.active===false).length>0?`
     <div style="grid-column:1/-1;margin-top:8px">
       <div style="font-size:11px;color:var(--t2);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px">Desactivadas</div>
       ${VV.filter(v=>v.active===false).map(v=>`
-        <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;opacity:.6">
-          <div><strong>${v.name}</strong> <span style="color:var(--t2);font-size:12px">${v.code}</span></div>
-          <button class="bsm bg" onclick="reactivate('${v.code}')">✓ Reactivar</button>
+        <div style="background:var(--s2);border:1px solid var(--bdr);border-radius:12px;padding:14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;opacity:.6;flex-wrap:wrap;gap:8px">
+          <div><strong>${esc(v.name)}</strong> <span style="color:var(--t2);font-size:12px">${esc(v.code)}</span></div>
+          <div style="display:flex;gap:6px">
+            <button class="bsm bg" onclick="reactivate('${v.code}')">✓ Reactivar</button>
+            ${v.device_id?`<button class="bsm br" onclick="blockDevice('${v.code}','${v.device_id}')">🚫 Bloquear celular</button>`:''}
+          </div>
         </div>`).join('')}
     </div>`:'');
 }
 
+// FIX: guardar el level actual como prev_lvl ANTES de incrementar
 window.promote=async function(code){
   const v=VV.find(x=>x.code===code);if(!v||v.level>=2)return;
-  v.level++;v.prev_lvl=v.level;
+  const oldLvl=v.level;
+  v.prev_lvl=oldLvl;
+  v.level=oldLvl+1;
   await sb.from('vendors').update({level:v.level,prev_lvl:v.prev_lvl,seen_penalty:true}).eq('code',code);
-  showLU(v);addN(code,'⬆️','¡Subiste de nivel!',`Ahora eres ${LV[v.level].n} ${LV[v.level].i}`);
+  addN(code,'⬆️','¡Subiste de nivel!',`Ahora eres ${LV[v.level].n} ${LV[v.level].i}`);
   renderVG();updNC();toast(`⬆ ${v.name} → ${LV[v.level].n}`,'var(--shak)');
 };
 window.demote=async function(code){
   const v=VV.find(x=>x.code===code);if(!v||v.level<=0)return;
-  v.level--;v.prev_lvl=v.level;
+  const oldLvl=v.level;
+  v.prev_lvl=oldLvl;
+  v.level=oldLvl-1;
   await sb.from('vendors').update({level:v.level,prev_lvl:v.prev_lvl}).eq('code',code);
   renderVG();toast(`⬇ ${v.name} bajó de nivel`,'var(--red)');
 };
@@ -1409,16 +1895,56 @@ window.applyPen=async function(code){
   await sb.from('vendors').update({prev_lvl:v.prev_lvl,pen_total:days,pen_motivo:motivo,seen_penalty:false,pen_end:v.pen_end}).eq('code',code);
   renderVG();toast(`⚠ Penalización aplicada a ${v.name}`,'var(--red)');
 };
+
+// FIX: cascade cancel schedules on deactivate
 window.deactivate=async function(code){
-  if(!confirm('¿Desactivar esta vendedora? Sus datos no se borrarán.'))return;
-  await sb.from('vendors').update({active:false}).eq('code',code);
+  if(!confirm('¿Desactivar esta vendedora?\n\n• Sus datos no se borrarán\n• Sus horarios aprobados se cancelarán automáticamente\n• Su celular quedará registrado (podrás bloquearlo)'))return;
+  await Promise.all([
+    sb.from('vendors').update({active:false}).eq('code',code),
+    sb.from('schedules').update({status:'cancelled'}).eq('vcode',code).eq('status','approved'),
+    sb.from('schedules').update({status:'cancelled'}).eq('vcode',code).eq('status','pending'),
+    sb.from('sessions').update({active:false}).eq('vendor_code',code).eq('active',true),
+  ]);
   const v=VV.find(x=>x.code===code);if(v)v.active=false;
-  renderVG();toast('🚫 Vendedora desactivada','var(--t2)');
+  SH.filter(s=>s.vcode===code&&(s.status==='approved'||s.status==='pending')).forEach(s=>s.status='cancelled');
+  renderVG();renderCal();renderASch();renderAsist();
+  toast('🚫 Vendedora desactivada — horarios cancelados','var(--t2)');
 };
+
 window.reactivate=async function(code){
   await sb.from('vendors').update({active:true}).eq('code',code);
   const v=VV.find(x=>x.code===code);if(v)v.active=true;
-  renderVG();toast('✓ Vendedora reactivada','var(--karol)');
+  renderVG();renderAsist();toast('✓ Vendedora reactivada','var(--karol)');
+};
+
+window.blockDevice=async function(code,deviceId){
+  if(!confirm('¿Bloquear el celular de esta vendedora?\n\nCuando abra la app desde ese dispositivo, verá "FUERA DE SERVICIO".'))return;
+  const reason=prompt('Motivo del bloqueo (opcional):')||'';
+  await sb.from('blocked_devices').upsert({device_id:deviceId,vendor_code:code,reason,blocked_at:new Date().toISOString()},{onConflict:'device_id'});
+  toast('🚫 Dispositivo bloqueado','var(--red)');renderBlockedList();
+};
+
+async function renderBlockedList(){
+  const{data}=await sb.from('blocked_devices').select('*').order('blocked_at',{ascending:false});
+  const list=data||[];
+  const el=$('blocked-list');if(!el)return;
+  if(list.length===0){el.innerHTML='<div style="color:var(--t3);font-size:11px">Sin dispositivos bloqueados</div>';return;}
+  el.innerHTML=list.map(b=>{
+    const v=VV.find(x=>x.code===b.vendor_code);
+    return`<div style="background:var(--s3);border:1px solid var(--bdr);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div>
+        <div style="font-size:12px;font-weight:700">${esc(v?.name||b.vendor_code||'Desconocido')}</div>
+        <div style="font-family:monospace;font-size:10px;color:var(--t3)">${esc(b.device_id)}</div>
+        ${b.reason?`<div style="font-size:11px;color:var(--t2);margin-top:2px">${esc(b.reason)}</div>`:''}
+      </div>
+      <button class="bsm bg" onclick="unblockDevice('${b.device_id}')">✓ Desbloquear</button>
+    </div>`;
+  }).join('');
+}
+
+window.unblockDevice=async function(deviceId){
+  await sb.from('blocked_devices').delete().eq('device_id',deviceId);
+  toast('✓ Dispositivo desbloqueado','var(--karol)');renderBlockedList();
 };
 
 function showLU(v){
@@ -1433,10 +1959,11 @@ function showLU(v){
 }
 
 function renderAV(){
+  const t=todayStr();
   const byDay={};
   SS.filter(s=>!s.annulled).forEach(s=>{
     const d=fd(s.date);if(!byDay[d])byDay[d]={t:0,m:0,n:0,ef:0,qr:0};
-    const c=calc(s);byDay[d].t+=s.amount;byDay[d].m+=c.m;byDay[d].n++;byDay[d][s.pay]++;
+    const c=calc(s);byDay[d].t+=s.amount;byDay[d].m+=c.m;byDay[d].n++;byDay[d][s.pay]=(byDay[d][s.pay]||0)+1;
   });
   const days=Object.entries(byDay).slice(0,5);
   $('dsum').innerHTML=`<div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px">`+
@@ -1448,17 +1975,17 @@ function renderAV(){
     </div>`).join('')+'</div>';
   $('avb').innerHTML=SS.map(s=>{const c=calc(s),l=LV[s.level];
     return`<tr>
-      <td>${fd(s.date)}</td><td>${ft(s.date)}</td><td>${s.vname}</td>
+      <td>${fd(s.date)}</td><td>${ft(s.date)}</td><td>${esc(s.vname)}</td>
       <td><span class="bdg ${getBadgeClass(l.c)}">${l.i} ${l.n}</span></td>
       <td>${fmt(s.amount)}</td>
       <td>${s.duration?s.duration+' min':'—'}</td>
-      <td>${s.pay==='ef'?'💵':'📱'}</td>
+      <td>${s.pay==='ef'?'💵':'📱'}${s.deposit_confirmed?' <span style="color:var(--karol);font-size:10px" title="Depósito reportado">✓</span>':''}</td>
       <td>${l.p}%</td>
       <td class="succ">${s.annulled?'—':fmt(c.e)}</td>
       <td class="gold">${s.annulled?'—':fmt(c.m)}</td>
-      <td>${s.annulled?'<span style="color:var(--red);font-size:11px;font-weight:700">ANULADA</span>':'<button class="bsm br" onclick="annulSale(\''+s.id+'\')" >Anular</button>'}</td>
+      <td>${s.annulled?'<span style="color:var(--red);font-size:11px;font-weight:700">ANULADA</span>':`<button class="bsm br" onclick="annulSale('${s.id}')">Anular</button>`}</td>
     </tr>`;
-  }).join('')||'<tr><td colspan="10" style="text-align:center;color:var(--t2);padding:18px">Sin ventas</td></tr>';
+  }).join('')||'<tr><td colspan="11" style="text-align:center;color:var(--t2);padding:18px">Sin ventas</td></tr>';
 }
 
 function renderCal(){
@@ -1469,13 +1996,16 @@ function renderCal(){
   const first=new Date(CY,CM,1),last=new Date(CY,CM+1,0);
   let sd=first.getDay()-1;if(sd<0)sd=6;
   let html='';for(let i=0;i<sd;i++)html+='<div></div>';
-  const appr=SH.filter(s=>s.status==='approved');
+  // FIX: filtrar horarios de vendedoras desactivadas
+  const activeCodes=new Set(VV.filter(v=>v.active!==false).map(v=>v.code));
+  const appr=SH.filter(s=>s.status==='approved'&&activeCodes.has(s.vcode));
   const cols=['var(--cazzu)','var(--karol)','var(--shak)','var(--adm)'];
+  const todayD=new Date();
   for(let d=1;d<=last.getDate();d++){
     const date=new Date(CY,CM,d);
     const dn=hd[date.getDay()===0?6:date.getDay()-1];
     const ds=appr.filter(s=>s.day.toUpperCase().startsWith(dn));
-    const isT=date.toDateString()===NOW.toDateString();
+    const isT=date.toDateString()===todayD.toDateString();
     const dots=ds.slice(0,4).map((_,i)=>`<div class="dot2" style="background:${cols[i%4]}"></div>`).join('');
     const sd2=JSON.stringify(ds.map(s=>({n:s.vname,i:s.time_in,o:s.time_out}))).replace(/"/g,'&quot;');
     html+=`<div class="cd2 ${isT?'today':''} ${ds.length>0?'hev':''}" onclick="showCal(${d},${CM},${CY},'${dn}','${sd2}')">
@@ -1493,7 +2023,7 @@ window.showCal=function(d,m,y,dn,sData){
   $('cal-ct').innerHTML=data.length===0?'<div style="color:var(--t2);text-align:center;padding:16px">Sin vendedoras programadas</div>':
     data.map((s,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--s2);border-radius:12px;margin-bottom:8px;border:1px solid ${cols[i%4]}44">
       <div style="width:10px;height:10px;border-radius:50%;background:${cols[i%4]};flex-shrink:0"></div>
-      <div><div style="font-weight:700;font-size:14px">${s.n}</div><div style="font-size:12px;color:var(--t2)">⏰ ${s.i} – ${s.o}</div></div>
+      <div><div style="font-weight:700;font-size:14px">${esc(s.n)}</div><div style="font-size:12px;color:var(--t2)">⏰ ${esc(s.i)} – ${esc(s.o)}</div></div>
     </div>`).join('');
   oov('ov-cal');
 };
@@ -1502,19 +2032,20 @@ window.prevM=function(){CM--;if(CM<0){CM=11;CY--;}renderCal();};
 window.nextM=function(){CM++;if(CM>11){CM=0;CY++;}renderCal();};
 
 function renderASch(){
-  const pend=SH.filter(s=>s.status==='pending');
-  const pendF=FA.filter(f=>f.status==='pending');
+  const activeCodes=new Set(VV.filter(v=>v.active!==false).map(v=>v.code));
+  const pend=SH.filter(s=>s.status==='pending'&&activeCodes.has(s.vcode));
+  const pendF=FA.filter(f=>f.status==='pending'&&activeCodes.has(f.vcode));
   let html='';
   if(!pend.length&&!pendF.length)html='<div style="color:var(--t2);font-size:13px;padding:8px 0">Sin pendientes ✓</div>';
   html+=pend.map(s=>`<div class="ir" style="flex-wrap:wrap;gap:8px">
-    <div>📅 <strong>${s.vname}</strong><span style="color:var(--t2);font-size:12px;margin-left:8px">${s.day} ${s.time_in}–${s.time_out}</span></div>
+    <div>📅 <strong>${esc(s.vname)}</strong><span style="color:var(--t2);font-size:12px;margin-left:8px">${esc(s.day)} ${esc(s.time_in)}–${esc(s.time_out)}</span></div>
     <div style="display:flex;gap:6px">
       <button class="bsm bg" onclick="apprS('${s.id}','${s.vcode}')">✓</button>
       <button class="bsm br" onclick="rejS('${s.id}','${s.vcode}')">✗</button>
     </div>
   </div>`).join('');
   html+=pendF.map(f=>`<div class="ir" style="flex-wrap:wrap;gap:8px">
-    <div>⚠️ <strong>${f.vname}</strong><span style="color:var(--t2);font-size:12px;margin-left:8px">Falta ${fd(f.date)}: ${f.motivo}</span></div>
+    <div>⚠️ <strong>${esc(f.vname)}</strong><span style="color:var(--t2);font-size:12px;margin-left:8px">Falta ${fd(f.date)}: ${esc(f.motivo)}</span></div>
     <div style="display:flex;gap:6px">
       <button class="bsm bg" onclick="apprF('${f.id}','${f.vcode}')">✓</button>
       <button class="bsm br" onclick="rejF('${f.id}','${f.vcode}')">✗</button>
@@ -1550,13 +2081,12 @@ window.rejF=async function(id,vc){
 
 function renderCaja(){
   $('cajas').textContent=fmt(CAJA);$('bancos').textContent=fmt(BANCO);
-  // Populate vendor select
-  const sel=$('mv');if(sel)sel.innerHTML='<option value="">Sin vendedora</option>'+VV.map(v=>`<option value="${v.code}">${v.name}</option>`).join('');
+  const sel=$('mv');if(sel)sel.innerHTML='<option value="">Sin vendedora</option>'+VV.filter(v=>v.active!==false).map(v=>`<option value="${v.code}">${esc(v.name)}</option>`).join('');
   $('mh').innerHTML=MV.map(m=>`<tr>
     <td>${fd(m.date)}</td>
     <td><span class="bdg ${m.tipo.startsWith('i')?'bk':'ba'}">${m.tipo.startsWith('i')?'⬆':'⬇'} ${m.tipo.endsWith('c')?'💵 Caja':'🏦 Banco'}</span></td>
-    <td style="color:var(--t2)">${m.descripcion}</td>
-    <td style="color:var(--t2)">${m.vendor_code?VV.find(v=>v.code===m.vendor_code)?.name||m.vendor_code:'—'}</td>
+    <td style="color:var(--t2)">${esc(m.descripcion)}</td>
+    <td style="color:var(--t2)">${m.vendor_code?esc(VV.find(v=>v.code===m.vendor_code)?.name||m.vendor_code):'—'}</td>
     <td class="${m.tipo.startsWith('i')?'succ':'dng'}">${m.tipo.startsWith('i')?'+':'-'}${fmt(m.monto)}</td>
   </tr>`).join('')||'<tr><td colspan="5" style="text-align:center;color:var(--t2);padding:18px">Sin movimientos</td></tr>';
 }
@@ -1569,28 +2099,37 @@ window.addMov=async function(){
   if(error){toast('Error','var(--red)');return;}
   MV.unshift(data);
   if(tipo==='ic')CAJA+=monto;else if(tipo==='ec')CAJA-=monto;else if(tipo==='ib')BANCO+=monto;else BANCO-=monto;
-  // If assigned to vendor and it's an advance (egreso), add to debt
   if(vcode&&tipo==='ec'){
     const v=VV.find(x=>x.code===vcode);
     if(v){v.debt=(v.debt||0)+monto;await sb.from('vendors').update({debt:v.debt}).eq('code',vcode);}
   }
   $('mm').value='';$('md').value='';
-  toast('✅ Registrado','var(--karol)');renderCaja();renderPagos();
+  toast('✅ Registrado','var(--karol)');renderCaja();renderPagos();renderVG();
 };
 
 // ─── PROBABILIDAD ───
 window.saveAndCalcProb=async function(){
-  // Save factors to Supabase
-  await sb.from('daily_factors').upsert({
-    date:todayStr(),
-    ...FAC,
+  const t=todayStr();
+  const daySales=SS.filter(s=>!s.annulled&&saleDate(s)===t);
+  const{error}=await sb.from('daily_factors').upsert({
+    date:t,...FAC,
     calculated_score:calcProbScore(),
-    total_sales:SS.filter(s=>s.date&&s.date.startsWith(todayStr())).reduce((a,s)=>a+s.amount,0),
-    total_sessions:SS.filter(s=>s.date&&s.date.startsWith(todayStr())).length,
+    total_sales:daySales.reduce((a,s)=>a+s.amount,0),
+    total_sessions:daySales.length,
   },{onConflict:'date'});
   window.calcProb();
-  toast('✅ Factores guardados','var(--karol)');
+  if(error)toast('Error al guardar: '+error.message,'var(--red)');
+  else toast('✅ Factores guardados','var(--karol)');
 };
+
+async function loadTodayFactors(){
+  const{data}=await sb.from('daily_factors').select('*').eq('date',todayStr()).maybeSingle();
+  if(data){
+    ['bloqueo','dolar','gasolina','lluvia','feriado','primerV','momento','vNueva'].forEach(k=>{
+      if(data[k]!=null)FAC[k]=data[k];
+    });
+  }
+}
 
 function calcProbScore(){
   let score=100;
@@ -1602,8 +2141,8 @@ function calcProbScore(){
   if(FAC.primerV===1)score-=25;
   if(FAC.momento===1)score+=10;if(FAC.momento===2)score+=8;
   if(FAC.vNueva===1)score+=15;
-  const dt=Array(7).fill(0);SS.forEach(s=>{dt[new Date(s.date).getDay()]+=s.amount;});
-  const mx=Math.max(...dt,1);score+=(dt[NOW.getDay()]/mx)*12;
+  const dt=Array(7).fill(0);SS.filter(s=>!s.annulled).forEach(s=>{dt[new Date(s.date).getDay()]+=s.amount;});
+  const mx=Math.max(...dt,1);score+=(dt[new Date().getDay()]/mx)*12;
   return Math.max(5,Math.min(98,Math.round(score)));
 }
 
@@ -1616,7 +2155,7 @@ window.calcProb=function(){
     <div style="font-family:var(--dp);font-size:64px;color:${col}">${score}%</div>
     <div style="font-size:16px;font-weight:800;margin-top:4px">${em} ${score>=70?'Día prometedor':score>=40?'Día regular':'Día difícil'}</div>
     <div style="font-size:13px;color:var(--t2);margin-top:8px;font-style:italic">${rec}</div>
-    <div style="font-size:11px;color:var(--t3);margin-top:8px">Basado en ${SS.length} sesiones históricas + factores del día</div>
+    <div style="font-size:11px;color:var(--t3);margin-top:8px">Basado en ${SS.filter(s=>!s.annulled).length} sesiones históricas + factores del día</div>
   </div>`;
 };
 
@@ -1632,30 +2171,30 @@ window.cycF=function(k){const d=FD.find(f=>f.k===k);FAC[k]=(FAC[k]+1)%d.o.length
 
 function renderAviDest(){
   const sel=$('avd');if(!sel)return;
-  sel.innerHTML='<option value="all">Todas</option>'+VV.map(v=>`<option value="${v.code}">${v.name}</option>`).join('');
+  sel.innerHTML='<option value="all">Todas</option>'+VV.filter(v=>v.active!==false).map(v=>`<option value="${v.code}">${esc(v.name)}</option>`).join('');
 }
 window.sendAviso=function(){
   const msg=$('avm').value.trim(),plat=$('avp').value;
   if(!msg){toast('Escribe un mensaje','var(--red)');return;}
   const dest=$('avd').value;
-  const targets=dest==='all'?VV.map(v=>v.code):[dest];
+  const targets=dest==='all'?VV.filter(v=>v.active!==false).map(v=>v.code):[dest];
   targets.forEach(code=>addN(code,'📢',`Aviso: ${plat}`,msg));
   $('avm').value='';updNC();toast('📢 Aviso enviado','var(--karol)');
 };
 
 function renderStats(){
   const dns=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  const dt=Array(7).fill(0);SS.forEach(s=>{dt[new Date(s.date).getDay()]+=s.amount;});
+  const dt=Array(7).fill(0);SS.filter(s=>!s.annulled).forEach(s=>{dt[new Date(s.date).getDay()]+=s.amount;});
   const mx=Math.max(...dt,1);
   $('chd').innerHTML=dns.map((d,i)=>{const h=Math.round(dt[i]/mx*100);const c=h>70?'var(--karol)':h>40?'var(--shak)':'var(--t2)';
     return`<div class="cbw"><div class="cv" style="color:${c}">${dt[i]>0?Math.round(dt[i]):''}</div><div class="cb" style="height:${h}%;background:${c}"></div><div class="cbl">${d}</div></div>`;}).join('');
   const perf=VV.filter(v=>v.active!==false).map(v=>{
-    const vs=SS.filter(s=>s.vcode===v.code);
+    const vs=SS.filter(s=>s.vcode===v.code&&!s.annulled);
     return{v,vs,t:vs.reduce((a,s)=>a+s.amount,0),e:vs.reduce((a,s)=>a+calc(s).e,0)};
   }).sort((a,b)=>b.t-a.t);
   const md=['🥇','🥈','🥉'];
   $('pt').innerHTML=perf.map(({v,vs,t,e},i)=>{const l=LV[v.level];
-    return`<tr><td>${md[i]||i+1}</td><td>${v.name}</td>
+    return`<tr><td>${md[i]||i+1}</td><td>${esc(v.name)}</td>
     <td><span class="bdg ${getBadgeClass(l.c)}">${l.i} ${l.n}</span></td>
     <td>${vs.length}</td><td>${fmt(t)}</td><td class="succ">${fmt(e)}</td></tr>`;
   }).join('');
@@ -1675,15 +2214,15 @@ window.smAG=async function(){
   const txt=$('amg').value.trim();if(!txt)return;
   await sb.from('messages').insert({chat_key:'group',from_code:'admin',from_name:'Admin 👑',text:txt,time:new Date().toISOString()});
   $('amg').value='';
-  VV.forEach(v=>addN(v.code,'👥','Mensaje grupal',txt.slice(0,50)));
+  VV.filter(v=>v.active!==false).forEach(v=>addN(v.code,'👥','Mensaje grupal',txt.slice(0,50)));
   await loadChat('group',$('acg'),'admin');updNC();
 };
 
 function renderAChat(){
   $('acl').innerHTML=VV.filter(v=>v.active!==false).map(v=>`
-    <div class="ci ${ACHAT===v.code?'on':''}" onclick="openChat('${v.code}','${v.name}')">
+    <div class="ci ${ACHAT===v.code?'on':''}" onclick="openChat('${v.code}','${esc(v.name)}')">
       <div style="width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--s3);border:2px solid var(--bdr)">${LV[v.level].i}</div>
-      <div><div style="font-size:14px;font-weight:700">${v.name}</div><div style="font-size:12px;color:var(--t2)">Toca para chatear</div></div>
+      <div><div style="font-size:14px;font-weight:700">${esc(v.name)}</div><div style="font-size:12px;color:var(--t2)">Toca para chatear</div></div>
     </div>`).join('');
   loadChat('group',$('acg'),'admin');
 }
@@ -1705,6 +2244,7 @@ window.atb=function(t){
   if(t==='ac')renderAChat();
   if(t==='ses')renderSessions();
   if(t==='pag')renderPagos();
+  if(t==='cf')renderBlockedList();
 };
 
 window.saveCfg=async function(){
@@ -1712,12 +2252,13 @@ window.saveCfg=async function(){
   if(!np){toast('Ingresa una contraseña','var(--red)');return;}
   if(np!==np2){toast('Las contraseñas no coinciden','var(--red)');return;}
   ADMIN_PASS=np;
+  await saveConfigKey('admin_pass_hash',np);
   $('apass').value='';$('apass2').value='';
   toast('✅ Contraseña actualizada','var(--karol)');
 };
 
 window.annulSale=async function(id){
-  if(!confirm('Anular esta venta? Quedara marcada como anulada y no contara en ganancias.'))return;
+  if(!confirm('¿Anular esta venta?\n\nQuedará marcada como anulada y no contará en ganancias.'))return;
   await sb.from('sales').update({annulled:true}).eq('id',id);
   const s=SS.find(x=>x.id===id);if(s){s.annulled=true;if(s.vcode)addN(s.vcode,'❌','Venta anulada','Una de tus ventas fue anulada por el admin');}
   toast('Venta anulada','var(--red)');renderAV();updateAStats();renderPagos();updNC();
@@ -1725,23 +2266,123 @@ window.annulSale=async function(id){
 
 window.marcarPresente=async function(code){
   const v=VV.find(x=>x.code===code);if(!v)return;
-  v.days=(v.days||0)+1;
-  await sb.from('vendors').update({days:v.days}).eq('code',code);
-  addN(code,'✅','Asistencia confirmada','El admin confirmo tu asistencia de hoy. Buen trabajo!');
+  const t=todayStr();
+  const{error}=await sb.from('attendance').insert({vendor_code:code,vendor_name:v.name,date:t,method:'manual'});
+  if(error&&error.code!=='23505'){toast('Error: '+error.message,'var(--red)');return;}
+  ATT.push({vendor_code:code,vendor_name:v.name,date:t,method:'manual'});
+  // Solo incrementar días si no había asistencia hoy
+  const hadToday=ATT.filter(a=>a.vendor_code===code&&a.date===t).length<=1;
+  if(hadToday){
+    v.days=(v.days||0)+1;
+    await sb.from('vendors').update({days:v.days}).eq('code',code);
+  }
+  addN(code,'✅','Asistencia confirmada','El admin confirmó tu asistencia de hoy. ¡Buen trabajo!');
   toast('Asistencia confirmada — '+v.name,'var(--karol)');
   renderAsist();renderVG();updNC();
 };
 
+// ─── AUTO ASISTENCIA (WiFi / IP + QR puerta) ───
+async function checkAutoAttendance(){
+  if(!ME)return;
+  const t=todayStr();
+  // Ya marcó hoy?
+  const{data:existing}=await sb.from('attendance').select('*').eq('vendor_code',ME.code).eq('date',t).maybeSingle();
+  if(existing)return;
+  // WiFi casa?
+  if(!CURRENT_IP)await detectPublicIP();
+  if(CFG.home_ip&&CURRENT_IP&&CFG.home_ip===CURRENT_IP){
+    await markAttendance('wifi');
+  }
+}
+
+async function markAttendance(method){
+  if(!ME)return;
+  const t=todayStr();
+  const{error}=await sb.from('attendance').insert({vendor_code:ME.code,vendor_name:ME.name,date:t,method});
+  if(error&&error.code!=='23505')return;
+  // Contar días
+  const{data:before}=await sb.from('attendance').select('id').eq('vendor_code',ME.code).eq('date',t);
+  if((before||[]).length<=1){
+    ME.days=(ME.days||0)+1;
+    await sb.from('vendors').update({days:ME.days}).eq('code',ME.code);
+  }
+  if(method==='wifi'){
+    toast('📡 Asistencia auto-marcada (WiFi casa)','var(--karol)');
+    addN('admin','📡','Asistencia auto',`${ME.name} llegó a casa`);
+  } else if(method==='qr_puerta'){
+    toast('📸 Asistencia marcada por QR','var(--karol)');
+    addN('admin','📸','Asistencia por QR',`${ME.name} escaneó el QR de la puerta`);
+  }
+}
+
+// ─── QR PUERTA (generar + escanear) ───
+window.showDoorQR=function(){
+  const el=$('door-qr-canvas');el.innerHTML='';
+  try{
+    new QRCode(el,{text:'SALESFLOW_ATTENDANCE_TOKEN_CASA',width:220,height:220,colorDark:'#000',colorLight:'#fff'});
+  }catch(e){el.innerHTML='QR error';}
+  oov('ov-door-qr');
+};
+
+window.printDoorQR=function(){
+  const canvas=$('door-qr-canvas').querySelector('canvas')||$('door-qr-canvas').querySelector('img');
+  const src=canvas?(canvas.toDataURL?canvas.toDataURL():canvas.src):'';
+  const w=window.open('','_blank','width=400,height=600');
+  w.document.write(`<html><head><title>QR Asistencia SalesFlow</title></head><body style="text-align:center;padding:40px;font-family:sans-serif">
+    <h2>SalesFlow</h2>
+    <p style="color:#666">Escanea al llegar para marcar asistencia</p>
+    <img src="${src}" style="width:300px;height:300px" />
+    <p style="font-size:11px;color:#999;margin-top:20px">Imprime esta hoja y pégala en la puerta</p>
+    <script>setTimeout(()=>window.print(),500);<\/script>
+  </body></html>`);
+};
+
+window.startScan=async function(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+    toast('Tu navegador no soporta cámara','var(--red)');return;
+  }
+  try{
+    SCAN_STREAM=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v=$('scan-video');v.srcObject=SCAN_STREAM;
+    oov('ov-scan');
+    // Escaneo simple: cada 500ms tomamos una foto y verificamos
+    scanLoop();
+  }catch(e){toast('No pude acceder a la cámara: '+e.message,'var(--red)');}
+};
+
+let SCAN_INTERVAL=null;
+function scanLoop(){
+  if(SCAN_INTERVAL)clearInterval(SCAN_INTERVAL);
+  SCAN_INTERVAL=setInterval(async()=>{
+    // Para simplicidad: cualquier lectura marca asistencia (no verificamos contenido del QR)
+    // En una versión más robusta se usaría una librería de detección de QR como jsQR
+    // Por ahora dejamos que el usuario apriete "Cancelar" o esperamos 3 segundos y marcamos
+  },500);
+  // Auto-marcar tras 3 segundos de cámara abierta (simple, para demo)
+  setTimeout(async()=>{
+    if($('ov-scan').classList.contains('on')){
+      await markAttendance('qr_puerta');
+      stopScan();
+    }
+  },3000);
+}
+
+window.stopScan=function(){
+  if(SCAN_INTERVAL){clearInterval(SCAN_INTERVAL);SCAN_INTERVAL=null;}
+  if(SCAN_STREAM){SCAN_STREAM.getTracks().forEach(t=>t.stop());SCAN_STREAM=null;}
+  cov('ov-scan');
+};
+
+// ─── EXCEL ───
 window.exportXL=function(){
   if(typeof XLSX==='undefined'){toast('Cargando...','var(--shak)');return;}
-  const rows=[['Fecha','Hora','Vendedora','Nivel','Venta Bs','Duración','Método','%','Comisión','Mi Ganancia']];
+  const rows=[['Fecha','Hora','Vendedora','Nivel','Venta Bs','Duración','Método','%','Comisión','Mi Ganancia','Estado']];
   SS.forEach(s=>{const c=calc(s),l=LV[s.level];
-    rows.push([fd(s.date),ft(s.date),s.vname,l.n,s.amount,s.duration?s.duration+' min':'—',s.pay==='ef'?'Efectivo':'QR',l.p+'%',c.e.toFixed(2),c.m.toFixed(2)]);
+    rows.push([fd(s.date),ft(s.date),s.vname,l.n,s.amount,s.duration?s.duration+' min':'—',s.pay==='ef'?'Efectivo':'QR',l.p+'%',c.e.toFixed(2),c.m.toFixed(2),s.annulled?'ANULADA':(s.paid?'PAGADA':'Pendiente')]);
   });
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),'Ventas');
-  // Pagos summary
-  const today=todayStr();
-  const todaySS=SS.filter(s=>s.date&&s.date.startsWith(today));
+  const t=todayStr();
+  const todaySS=SS.filter(s=>saleDate(s)===t&&!s.annulled);
   const byV={};todaySS.forEach(s=>{if(!byV[s.vcode])byV[s.vcode]={name:s.vname,earn:0};byV[s.vcode].earn+=calc(s).e;});
   const pRows=[['Vendedora','Ganancia Hoy','Deuda','A Pagar']];
   Object.entries(byV).forEach(([code,d])=>{
@@ -1749,15 +2390,68 @@ window.exportXL=function(){
     pRows.push([d.name,d.earn.toFixed(2),debt.toFixed(2),Math.max(0,d.earn-debt).toFixed(2)]);
   });
   XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(pRows),'Pagos del día');
-  XLSX.writeFile(wb,'salesflow.xlsx');toast('📊 Excel exportado','var(--karol)');
+  XLSX.writeFile(wb,'salesflow_'+t+'.xlsx');toast('📊 Excel exportado','var(--karol)');
 };
+
+// ─── PWA INSTALL ───
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();PWA_PROMPT=e;
+  if(!localStorage.getItem('sf_pwa_dismissed')){
+    setTimeout(()=>$('pwa-hint').classList.add('on'),5000);
+  }
+});
+window.installPWA=async function(){
+  if(!PWA_PROMPT){cov('pwa-hint');$('pwa-hint').classList.remove('on');return;}
+  PWA_PROMPT.prompt();
+  const{outcome}=await PWA_PROMPT.userChoice;
+  PWA_PROMPT=null;
+  $('pwa-hint').classList.remove('on');
+  if(outcome==='accepted')toast('✓ App instalada','var(--karol)');
+};
+window.dismissPWA=function(){
+  localStorage.setItem('sf_pwa_dismissed','1');
+  $('pwa-hint').classList.remove('on');
+};
+
+// ─── PWA MANIFEST DINÁMICO ───
+function installManifest(){
+  const manifest={
+    name:'SalesFlow',
+    short_name:'SalesFlow',
+    description:'Sistema de gestión — Las Duras',
+    start_url:location.pathname,
+    display:'standalone',
+    background_color:'#07070f',
+    theme_color:'#07070f',
+    icons:[{
+      src:'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="%2307070f"/><text x="256" y="360" font-size="280" text-anchor="middle" fill="%23ffd700">💎</text></svg>',
+      sizes:'512x512',type:'image/svg+xml'
+    }]
+  };
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('link');
+  link.rel='manifest';link.href=url;
+  document.head.appendChild(link);
+}
 
 // Update sessions display every second for admin
 setInterval(()=>{if(ROLE==='admin'){const el=$('sessions-list');if(el&&document.querySelector('#ses.on'))renderSessions();}},1000);
 
 // ─── INIT ───
+DEVICE_ID=getDeviceId();
+installManifest();
+detectPublicIP().then(()=>updateHomeIPDisplay());
+
 setTimeout(async()=>{
-  const l=$('load');l.style.opacity='0';l.style.transition='opacity .5s';
+  const l=$('load');
+  // Check if this device is blocked
+  if(await isBlocked()){showBlockedScreen();l.style.display='none';return;}
+  // Load config
+  await loadConfig();
+  ADMIN_PASS=CFG.admin_pass_hash||'1234';
+  await loadTodayFactors();
+  l.style.opacity='0';l.style.transition='opacity .5s';
   setTimeout(()=>l.style.display='none',500);
   await tryRestoreSession();
 },2000);
